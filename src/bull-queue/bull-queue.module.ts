@@ -21,12 +21,16 @@ import { GamePointModule } from 'src/game-point/game-point.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         prefix: `{${process.env.APP_ID}}`,
-        createClient: (type, config) =>
-          new Redis({
+        createClient: (type) => {
+          const opts = type !== 'client' ? { enableReadyCheck: false, maxRetriesPerRequest: null } : {};
+
+          return new Redis({
             host: process.env.HOST_REDIS,
             password: process.env.PASSWORD_REDIS,
             port: Number(process.env.PORT_REDIS),
-          }),
+            ...opts,
+          });
+        },
         defaultJobOptions: {
           attempts: 20,
           removeOnComplete: 100,

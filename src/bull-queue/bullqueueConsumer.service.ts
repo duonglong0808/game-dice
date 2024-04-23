@@ -15,7 +15,7 @@ export class BullQueueConsumerServiceCalcPointDice {
 
   @Process()
   async calcPointDice(job: Job<DataJobCalcPointDice>) {
-    console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ job:', job);
+    // console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ job:', job);
     const data = job.data;
     const { diceDetailId, transactionId, totalRed } = data;
     const { data: listUser } = await this.historyPlayService.findAll(transactionId, diceDetailId);
@@ -154,9 +154,11 @@ export class BullQueueConsumerServiceCalcPointDice {
         }
       });
     }
+
+    return this.updatePointUser(dataUserUpPoint);
   }
 
-  async userPositionOne(dataUserUpPoint: DataJobAddPointToUser[]) {
+  async updatePointUser(dataUserUpPoint: DataJobAddPointToUser[]) {
     if (dataUserUpPoint.length) {
       await this.bullQueueService.addToQueueAddPointToUser(dataUserUpPoint);
     }
