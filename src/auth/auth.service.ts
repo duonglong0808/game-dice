@@ -82,9 +82,6 @@ export class AuthService {
 
     if (!user) {
       throw new HttpException(messageResponse.auth.userNotFound, HttpStatus.BAD_REQUEST);
-      // const dataAccountKu = await this.kuApiService.CheckAccountKu(dto.account, dto.password, dto.BBOSID);
-      // if (!dataAccountKu) throw new HttpException(messageResponse.auth.userNotFound, HttpStatus.BAD_REQUEST);
-      // user = await this.userService.create({ username: dto.account, name: dataAccountKu.NickName, password: dto.password, phone: new Date().getTime().toString() });
     } else {
       const checkPass = await this.helper.verifyHash(user.password, dto.password);
       if (!checkPass) throw new HttpException(messageResponse.auth.password_wrong, HttpStatus.BAD_REQUEST);

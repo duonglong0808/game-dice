@@ -18,7 +18,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { GameDiceModule } from './dice/dice.module';
-import { DiceDetailModule } from './dice-detail/dice.module';
+import { DiceDetailModule } from './dice-detail/dice-detail.module';
+import { HistoryPlayModule } from './history-play/history-play.module';
 
 console.log(__dirname);
 @Module({
@@ -98,6 +99,7 @@ console.log(__dirname);
     UploadModule,
     GameDiceModule,
     DiceDetailModule,
+    HistoryPlayModule,
   ],
   providers: [
     //

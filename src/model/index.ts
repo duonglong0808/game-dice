@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 export * from './user.model';
 export * from './gameDice.model';
 export * from './diceDetail.model';
+export * from './historyPlayDice.model';
 
 export const addConditionNotDelete = (options: any) => {
   if (!options.where) {

@@ -16,6 +16,10 @@ export class DiceService {
     return this.gameDiceRepository.create(dto);
   }
 
+  checkExitByCondition(condition: object): Promise<number> {
+    return this.gameDiceRepository.count(condition);
+  }
+
   findAll(pagination: Pagination, sort?: string, typeSort?: string) {
     return this.gameDiceRepository.findAll({}, { sort, typeSort, ...pagination, projection: ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive'] });
   }

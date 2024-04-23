@@ -75,24 +75,24 @@ export class RedisService {
     } catch (error) {}
   }
 
-  // async scanKey(key: string) {
-  //   let keys = [];
-  //   keys = await new Promise((resolve, reject) => {
-  //     const stream = this.cluster.scanStream({ match: `*${key}*` });
-  //     let keys = [];
-  //     stream.on('data', (resultKeys) => {
-  //       keys = keys.concat(resultKeys);
-  //     });
-  //     stream.on('end', () => {
-  //       resolve(keys);
-  //     });
-  //     stream.on('error', (error) => {
-  //       reject(error);
-  //     });
-  //   });
+  async scanKey(key: string) {
+    let keys = [];
+    keys = await new Promise((resolve, reject) => {
+      const stream = this.cluster.scanStream({ match: `*${key}*` });
+      let keys = [];
+      stream.on('data', (resultKeys) => {
+        keys = keys.concat(resultKeys);
+      });
+      stream.on('end', () => {
+        resolve(keys);
+      });
+      stream.on('error', (error) => {
+        reject(error);
+      });
+    });
 
-  //   return keys;
-  // }
+    return keys;
+  }
 
   async findKey(key: string) {
     const result = [];
@@ -110,6 +110,10 @@ export class RedisService {
 
   async delete(key: string) {
     return this.cluster.del(key);
+  }
+
+  async deleteMany(key: string[]) {
+    return this.cluster.del(...key);
   }
 
   async getdel(key: string) {

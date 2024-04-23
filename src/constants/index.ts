@@ -34,9 +34,27 @@ export const StatusDiceDetail = {
   prepare: 0,
   shake: 1,
   bet: 2,
-  open: 3,
+  waitOpen: 3,
   check: 4,
   end: 5,
+};
+
+export const TypeAnswerDice = {
+  p1: 1,
+  p2: 2,
+  p3: 3,
+  p4: 4,
+  p5: 5,
+  p6: 6,
+  p7: 7,
+  p8: 8,
+  p9: 9,
+  p10: 10,
+};
+
+export const StatusHistoryPlayDice = {
+  wait: 0,
+  success: 1,
 };
 
 export * from './message';
