@@ -7,9 +7,10 @@ import { DiceDetailRepository } from './repository/dice-detail.repository';
 import { GameDiceModule } from 'src/dice/dice.module';
 import { DiceService } from 'src/dice/dice.service';
 import { RedisService } from 'src/cache/redis.service';
+import { BullQueueModule } from 'src/bull-queue/bull-queue.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([DiceDetailModel]), GameDiceModule],
+  imports: [SequelizeModule.forFeature([DiceDetailModel]), GameDiceModule, BullQueueModule],
   controllers: [DiceDetailController],
   providers: [
     DiceDetailService,

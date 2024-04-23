@@ -16,6 +16,12 @@ export class HistoryPlayDiceModel extends Model {
   id: number;
 
   @Column({ type: DataType.INTEGER })
+  userId: number;
+
+  @Column({ type: DataType.INTEGER })
+  gamePointId: number;
+
+  @Column({ type: DataType.INTEGER })
   transaction: number;
 
   @Column({ type: DataType.INTEGER })

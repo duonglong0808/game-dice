@@ -18,14 +18,15 @@ export class HistoryPlayController {
       dto.userId = user?.id;
       return await this.historyPlayService.create(dto);
     } catch (error) {
+      console.log('🚀 ~ HistoryPlayController ~ create ~ error:', error);
       throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  @Get()
-  findAll() {
-    return this.historyPlayService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.historyPlayService.findAll();
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

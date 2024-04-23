@@ -58,3 +58,4 @@ export const StatusHistoryPlayDice = {
 };
 
 export * from './message';
+export * from './interface';

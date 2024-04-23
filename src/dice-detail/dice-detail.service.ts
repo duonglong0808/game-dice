@@ -6,6 +6,7 @@ import { StatusDiceDetail, messageResponse } from 'src/constants';
 import { Pagination } from 'src/middlewares';
 import { DiceService } from 'src/dice/dice.service';
 import { RedisService } from 'src/cache/redis.service';
+import { BullQueueService } from 'src/bull-queue/bullqueue.service';
 
 @Injectable()
 export class DiceDetailService {
@@ -14,6 +15,7 @@ export class DiceDetailService {
     private readonly gameDiceRepository: DiceDetailRepositoryInterface,
     private readonly diceService: DiceService,
     private readonly cacheService: RedisService,
+    private readonly bullQueueService: BullQueueService,
   ) {}
 
   async create(dto: CreateGameDiceDetailDto) {
@@ -44,26 +46,32 @@ export class DiceDetailService {
   async updateStatus(id: number) {
     const diceDetail = await this.findOne(id);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
+    const key = `dice:${diceDetail.id}:${diceDetail.transaction}`;
     switch (diceDetail.status) {
       case StatusDiceDetail.prepare:
         diceDetail.status = StatusDiceDetail.shake;
+        await this.cacheService.set(key, StatusDiceDetail.shake);
         break;
       case StatusDiceDetail.shake:
-        const key = `dice:${diceDetail.id}:${diceDetail.transaction}`;
-        await this.cacheService.set(key, 1);
+        await this.cacheService.set(key, StatusDiceDetail.bet);
         // await this.cacheService.set(key, 1, 14);
         diceDetail.status = StatusDiceDetail.bet;
         break;
       case StatusDiceDetail.bet:
+        await this.cacheService.set(key, StatusDiceDetail.waitOpen);
+        diceDetail.status = StatusDiceDetail.waitOpen;
+        // Delete keys
         const keyPlayer = `dice-play:${diceDetail.id}:${diceDetail.transaction}:`;
         const keys = await this.cacheService.scanKey(keyPlayer);
         await this.cacheService.deleteMany(keys);
-        diceDetail.status = StatusDiceDetail.waitOpen;
         break;
       case StatusDiceDetail.waitOpen:
+        await this.cacheService.set(key, StatusDiceDetail.check);
         diceDetail.status = StatusDiceDetail.check;
         break;
       case StatusDiceDetail.check:
+        await this.cacheService.delete(key);
+        this.bullQueueService.addToQueueCalcPointDice({ diceDetailId: diceDetail.id, totalRed: diceDetail.totalRed, transactionId: diceDetail.transaction });
         diceDetail.status = StatusDiceDetail.end;
         break;
 
