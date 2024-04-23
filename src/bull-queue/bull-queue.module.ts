@@ -33,7 +33,7 @@ import { GamePointModule } from 'src/game-point/game-point.module';
         },
         defaultJobOptions: {
           attempts: 20,
-          removeOnComplete: 100,
+          removeOnComplete: true,
           removeOnFail: false,
           backoff: {
             type: 'exponential',

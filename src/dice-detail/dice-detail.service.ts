@@ -20,7 +20,11 @@ export class DiceDetailService {
 
   async create(dto: CreateGameDiceDetailDto) {
     if (dto.totalRed > 4 || dto.totalRed <= 0) throw new Error(messageResponse.system.dataInvalid);
-    const [exit, dice] = await Promise.all([this.gameDiceRepository.count({ transaction: dto.transaction }), this.diceService.checkExitByCondition({ id: dto.gameDiceId })]);
+    const [exit, dice] = await Promise.all([
+      //
+      this.gameDiceRepository.count({ transaction: dto.transaction, gameDiceId: dto.gameDiceId }),
+      this.diceService.checkExitByCondition({ id: dto.gameDiceId }),
+    ]);
     if (exit != 0 || dice == 0) throw new Error(messageResponse.system.dataInvalid);
     return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare });
   }
@@ -46,7 +50,7 @@ export class DiceDetailService {
   async updateStatus(id: number) {
     const diceDetail = await this.findOne(id);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
-    const key = `dice:${diceDetail.id}:${diceDetail.transaction}`;
+    const key = `dice-detail:${diceDetail.gameDiceId}:${diceDetail.transaction}`;
     switch (diceDetail.status) {
       case StatusDiceDetail.prepare:
         diceDetail.status = StatusDiceDetail.shake;

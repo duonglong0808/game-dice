@@ -5,8 +5,8 @@ export class CreateHistoryPlayDto {
   @ApiProperty({ name: 'transaction', description: 'Phiên', type: Number })
   transaction: number;
 
-  @ApiProperty({ name: 'diceDetailId', description: 'Id phiên live', type: Number })
-  diceDetailId: number;
+  @ApiProperty({ name: 'gameDiceId', description: 'Id phiên live', type: Number })
+  gameDiceId: number;
 
   @ApiProperty({ name: 'answer', description: 'Đáp án người dùng chọn', type: Number, example: TypeAnswerDice.p1 })
   answer: number;

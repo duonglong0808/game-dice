@@ -12,7 +12,7 @@ export class DiceDetailModel extends Model {
   @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
   id: number;
 
-  @Column({ type: DataType.INTEGER, unique: true })
+  @Column({ type: DataType.INTEGER })
   transaction: number;
 
   @Column({ type: DataType.INTEGER })

@@ -19,11 +19,11 @@ export class HistoryPlayService {
 
   async create(dto: CreateHistoryPlayDto) {
     if (dto.point <= 0) throw new Error(messageResponse.system.dataInvalid);
-    const keyRunning = `dice:${dto.diceDetailId}:${dto.transaction}`;
+    const keyRunning = `dice-detail:${dto.gameDiceId}:${dto.transaction}`;
     const checkTTLKey = await this.cacheService.get(keyRunning);
     if (checkTTLKey != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
     // Check các option đã chơi
-    const keyCheckBetPosition = `dice-play:${dto.diceDetailId}:${dto.transaction}:${dto.userId}`;
+    const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}:${dto.userId}`;
     const dataRedis = await this.cacheService.hget(keyCheckBetPosition);
     const dataAnswerUser = Object.keys(dataRedis);
     if (dataAnswerUser.includes(String(dto.answer))) throw new Error(messageResponse.historyPlay.positionHasChoice);
@@ -38,7 +38,11 @@ export class HistoryPlayService {
     const gamePointId = await this.checkBalanceAndDeductPoint('ku-casino', dto.userId, dto.point);
     if (!gamePointId) throw new Error(messageResponse.historyPlay.accountNotHaveEnoughPoints);
     // Lưu lại lịch sử vừa chơi
-    await this.cacheService.hset(keyCheckBetPosition, String(dto.answer), dto.point);
+    await Promise.all([
+      //
+      this.cacheService.hset(keyCheckBetPosition, String(dto.answer), dto.point),
+      // this.cacheService.sadd(`user-play-dice:${dto.transaction}`, keyCheckBetPosition),
+    ]);
     return this.historyPlayRepository.create({ ...dto, gamePointId });
   }
 
