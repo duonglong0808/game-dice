@@ -6,7 +6,10 @@ import { StatusDiceDetail } from 'src/constants';
 @Table({
   tableName: 'DiceDetails',
   timestamps: true,
-  indexes: [{ name: 'gameDiceId_index', fields: ['gameDiceId'] }],
+  indexes: [
+    { name: 'gameDiceId_index', fields: ['gameDiceId'] },
+    { name: 'transaction_index', fields: ['transaction'] },
+  ],
 })
 export class DiceDetailModel extends Model {
   @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })

@@ -21,6 +21,7 @@ import { GameDiceModule } from './dice/dice.module';
 import { DiceDetailModule } from './dice-detail/dice-detail.module';
 import { HistoryPlayModule } from './history-play/history-play.module';
 import { BullQueueModule } from './bull-queue/bull-queue.module';
+import { HttpModule } from '@nestjs/axios';
 
 console.log(__dirname);
 @Module({
@@ -30,7 +31,11 @@ console.log(__dirname);
       isGlobal: true,
       expandVariables: true,
     }),
-
+    HttpModule.registerAsync({
+      useFactory: () => ({
+        timeout: 5000,
+      }),
+    }),
     MailerModule.forRootAsync({
       // imports: [ConfigModule], // import module if not enabled globally
       useFactory: async (config: ConfigService) => ({

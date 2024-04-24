@@ -57,5 +57,10 @@ export const StatusHistoryPlayDice = {
   success: 1,
 };
 
+export const TypeUpdatePointUser = {
+  up: 0,
+  down: 1,
+};
+
 export * from './message';
 export * from './interface';

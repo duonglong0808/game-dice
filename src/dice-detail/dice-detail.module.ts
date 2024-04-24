@@ -8,9 +8,11 @@ import { GameDiceModule } from 'src/dice/dice.module';
 import { DiceService } from 'src/dice/dice.service';
 import { RedisService } from 'src/cache/redis.service';
 import { BullQueueModule } from 'src/bull-queue/bull-queue.module';
+import { HttpModule } from '@nestjs/axios';
+import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
 
 @Module({
-  imports: [SequelizeModule.forFeature([DiceDetailModel]), GameDiceModule, BullQueueModule],
+  imports: [SequelizeModule.forFeature([DiceDetailModel]), GameDiceModule, BullQueueModule, HttpModule],
   controllers: [DiceDetailController],
   providers: [
     DiceDetailService,
@@ -20,6 +22,7 @@ import { BullQueueModule } from 'src/bull-queue/bull-queue.module';
     },
     DiceService,
     RedisService,
+    SendMessageWsService,
   ],
   exports: [
     {

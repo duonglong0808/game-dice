@@ -8,4 +8,5 @@ export interface DataJobAddPointToUser {
   userId: number;
   gamePointId: number;
   points: number;
+  type: number;
 }

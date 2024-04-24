@@ -1,16 +1,18 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import { Sequelize } from 'sequelize';
-import { DataJobAddPointToUser, DataJobCalcPointDice, TypeAnswerDice } from 'src/constants';
+import { DataJobAddPointToUser, DataJobCalcPointDice, TypeAnswerDice, TypeUpdatePointUser } from 'src/constants';
 import { HistoryPlayService } from 'src/history-play/history-play.service';
 import { BullQueueService } from './bullqueue.service';
 import { UserPointService } from 'src/user-point/user-point.service';
+import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
 
 @Processor('calc-point-dice')
 export class BullQueueConsumerServiceCalcPointDice {
   constructor(
     private readonly bullQueueService: BullQueueService,
     private readonly historyPlayService: HistoryPlayService,
+    private readonly sendMessageWsService: SendMessageWsService,
   ) {}
 
   @Process()
@@ -31,6 +33,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         } else if (userAnswer.answer == TypeAnswerDice.p10) {
           const user = dataUserUpPoint.find((user) => user.userId);
@@ -41,6 +44,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
@@ -56,6 +60,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
@@ -70,6 +75,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
@@ -86,6 +92,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
@@ -102,6 +109,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
@@ -118,6 +126,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
@@ -134,6 +143,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
@@ -150,17 +160,19 @@ export class BullQueueConsumerServiceCalcPointDice {
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
+              type: TypeUpdatePointUser.up,
             });
         }
       });
     }
 
-    return this.updatePointUser(dataUserUpPoint);
+    return this.updatePointUserAndSendWs(dataUserUpPoint);
   }
 
-  async updatePointUser(dataUserUpPoint: DataJobAddPointToUser[]) {
+  async updatePointUserAndSendWs(dataUserUpPoint: DataJobAddPointToUser[]) {
     if (dataUserUpPoint.length) {
-      await this.bullQueueService.addToQueueAddPointToUser(dataUserUpPoint);
+      await this.sendMessageWsService.upPointByUser(dataUserUpPoint);
+      this.bullQueueService.addToQueueAddPointToUser(dataUserUpPoint);
     }
   }
 }

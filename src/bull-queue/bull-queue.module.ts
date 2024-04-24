@@ -6,17 +6,17 @@ import { BullQueueConsumerServiceAddPointToUser, BullQueueConsumerServiceCalcPoi
 import { BullQueueService } from './bullqueue.service';
 import { HistoryPlayModule } from 'src/history-play/history-play.module';
 import { HistoryPlayService } from 'src/history-play/history-play.service';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { HistoryPlayDiceModel } from 'src/model';
 import { UserPointModule } from 'src/user-point/user-point.module';
 import { UserPointService } from 'src/user-point/user-point.service';
 import { RedisService } from 'src/cache/redis.service';
 import { GamePointModule } from 'src/game-point/game-point.module';
+import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     // SequelizeModule.forFeature([HistoryPlayDiceModel]),
-
+    HttpModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -63,6 +63,7 @@ import { GamePointModule } from 'src/game-point/game-point.module';
     HistoryPlayService,
     UserPointService,
     RedisService,
+    SendMessageWsService,
   ],
   exports: [BullQueueService],
 })

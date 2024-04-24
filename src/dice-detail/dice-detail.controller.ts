@@ -20,7 +20,7 @@ export class DiceDetailController {
     }
   }
 
-  @Get()
+  @Get('admin')
   @BaseFilter()
   @ApiQuery({
     name: 'gameDiceId',
@@ -28,9 +28,24 @@ export class DiceDetailController {
     type: Number,
   })
   @ApiOperationCustom('Dice Detail', 'get')
-  findAll(@Req() req: any, @Query('gameDiceId') gameDiceId: number, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
+  findAllByCMS(@Req() req: any, @Query('gameDiceId') gameDiceId: number, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
     try {
-      return this.diceDetailService.findAll(gameDiceId, req['pagination'], sort, typeSort);
+      return this.diceDetailService.findAllCMS(gameDiceId, req['pagination'], sort, typeSort);
+    } catch (error) {
+      throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('')
+  @ApiQuery({
+    name: 'gameDiceId',
+    description: 'Id cuar game',
+    type: Number,
+  })
+  @ApiOperationCustom('Dice Detail for user', 'get')
+  findAll(@Query('gameDiceId') gameDiceId: number) {
+    try {
+      return this.diceDetailService.findHistoryNear(gameDiceId);
     } catch (error) {
       throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
     }

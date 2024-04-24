@@ -7,6 +7,7 @@ import { Pagination } from 'src/middlewares';
 import { DiceService } from 'src/dice/dice.service';
 import { RedisService } from 'src/cache/redis.service';
 import { BullQueueService } from 'src/bull-queue/bullqueue.service';
+import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
 
 @Injectable()
 export class DiceDetailService {
@@ -16,6 +17,7 @@ export class DiceDetailService {
     private readonly diceService: DiceService,
     private readonly cacheService: RedisService,
     private readonly bullQueueService: BullQueueService,
+    private readonly sendMessageWsService: SendMessageWsService,
   ) {}
 
   async create(dto: CreateGameDiceDetailDto) {
@@ -29,10 +31,29 @@ export class DiceDetailService {
     return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare });
   }
 
-  findAll(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
+  findAllCMS(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
     const filter: any = {};
     if (gameDiceId) filter.gameDiceId = gameDiceId;
     return this.gameDiceRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'totalRed', 'status', 'gameDiceId'] });
+  }
+
+  async findHistoryNear(gameDiceId: number) {
+    const { data: dataHistory } = await this.gameDiceRepository.findAll(
+      {
+        gameDiceId,
+        status: StatusDiceDetail.end,
+      },
+      {
+        limit: 10,
+        sort: 'transaction',
+        typeSort: 'ASC',
+      },
+    );
+    const { data: transactionNow } = await this.gameDiceRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
+    return {
+      dataHistory,
+      transactionNow,
+    };
   }
 
   findOne(id: number) {
@@ -83,7 +104,7 @@ export class DiceDetailService {
         throw new Error(messageResponse.diceDetail.transactionIsFinished);
         break;
     }
-
+    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.status);
     return diceDetail.save();
   }
 
