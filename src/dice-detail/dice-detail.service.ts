@@ -104,7 +104,7 @@ export class DiceDetailService {
         throw new Error(messageResponse.diceDetail.transactionIsFinished);
         break;
     }
-    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.status);
+    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
     return diceDetail.save();
   }
 
