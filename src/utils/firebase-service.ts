@@ -14,7 +14,7 @@ export class FirebaseService {
       const bucket = storage.bucket(); // Use the default Firebase Storage bucket
 
       const uniqueFileName = `${Date.now()}-${fileLocal.originalname}`;
-      const file = bucket.file(`image/${collectionName}/${uniqueFileName}`);
+      const file = bucket.file(`${collectionName}/${uniqueFileName}`);
 
       await file.save(imageData);
 
@@ -36,7 +36,7 @@ export class FirebaseService {
       const bucket = storage.bucket(); // Use the default Firebase Storage bucket
 
       const uniqueFileName = `${Date.now()}-${fileLocal.originalname}`;
-      const file = bucket.file(`image/${collectionName}/${uniqueFileName}`);
+      const file = bucket.file(`${collectionName}/${uniqueFileName}`);
 
       // await file.save(fileLocal.buffer);
       await file.save(imageData);
