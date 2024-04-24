@@ -42,7 +42,7 @@ export class UserModel extends Model {
   @Column({ type: DataType.STRING, defaultValue: Status.Active })
   status: string;
 
-  @Column({ type: DataType.STRING })
+  @Column({ type: DataType.TEXT })
   avatar: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: true })

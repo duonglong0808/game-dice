@@ -20,7 +20,7 @@ export class GameDiceModel extends Model {
   @Column({ type: DataType.STRING })
   nameAuthor: string;
 
-  @Column({ type: DataType.STRING })
+  @Column({ type: DataType.TEXT })
   avtAuthor: string;
 
   @Column({ type: DataType.STRING })
