@@ -78,7 +78,7 @@ export class DiceDetailService {
         await this.cacheService.set(key, StatusDiceDetail.shake);
         break;
       case StatusDiceDetail.shake:
-        await this.cacheService.set(key, StatusDiceDetail.bet);
+        await this.cacheService.set(key, `${StatusDiceDetail.bet}:${new Date().getTime()}`);
         // await this.cacheService.set(key, 1, 14);
         diceDetail.status = StatusDiceDetail.bet;
         break;
@@ -104,7 +104,7 @@ export class DiceDetailService {
         throw new Error(messageResponse.diceDetail.transactionIsFinished);
         break;
     }
-    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
+    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.transaction, diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
     return diceDetail.save();
   }
 
