@@ -170,6 +170,7 @@ export class BullQueueConsumerServiceCalcPointDice {
   }
 
   async updatePointUserAndSendWs(dataUserUpPoint: DataJobAddPointToUser[]) {
+    // console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ updatePointUserAndSendWs ~ dataUserUpPoint:', dataUserUpPoint);
     if (dataUserUpPoint.length) {
       await this.sendMessageWsService.upPointByUser(dataUserUpPoint);
       this.bullQueueService.addToQueueAddPointToUser(dataUserUpPoint);

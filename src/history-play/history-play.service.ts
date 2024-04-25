@@ -19,9 +19,10 @@ export class HistoryPlayService {
 
   async create(dto: CreateHistoryPlayDto) {
     if (dto.point <= 0) throw new Error(messageResponse.system.dataInvalid);
-    const keyRunning = `dice-detail:${dto.gameDiceId}:${dto.transaction}`;
-    const checkTTLKey = await this.cacheService.get(keyRunning);
-    if (checkTTLKey != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
+    const keyRunning = `dice-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
+    const statusDice: string = await this.cacheService.get(keyRunning);
+    console.log('🚀 ~ HistoryPlayService ~ create ~ statusDice:', statusDice);
+    if (+statusDice?.split(':')[0] != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
     // Check các option đã chơi
     const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}:${dto.userId}`;
     const dataRedis = await this.cacheService.hget(keyCheckBetPosition);

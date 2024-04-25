@@ -71,7 +71,7 @@ export class DiceDetailService {
   async updateStatus(id: number) {
     const diceDetail = await this.findOne(id);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
-    const key = `dice-detail:${diceDetail.gameDiceId}:${diceDetail.transaction}`;
+    const key = `dice-detail:${diceDetail.gameDiceId}:${diceDetail.id}:${diceDetail.transaction}`;
     switch (diceDetail.status) {
       case StatusDiceDetail.prepare:
         diceDetail.status = StatusDiceDetail.shake;
@@ -86,9 +86,10 @@ export class DiceDetailService {
         await this.cacheService.set(key, StatusDiceDetail.waitOpen);
         diceDetail.status = StatusDiceDetail.waitOpen;
         // Delete keys
-        const keyPlayer = `dice-play:${diceDetail.id}:${diceDetail.transaction}:`;
+        const keyPlayer = `dice-play:${diceDetail.gameDiceId}:${diceDetail.transaction}:`;
         const keys = await this.cacheService.scanKey(keyPlayer);
-        await this.cacheService.deleteMany(keys);
+        console.log('🚀 ~ DiceDetailService ~ updateStatus ~ keyPlayer:', keyPlayer, keys);
+        this.cacheService.deleteMany(keys);
         break;
       case StatusDiceDetail.waitOpen:
         await this.cacheService.set(key, StatusDiceDetail.check);
@@ -104,7 +105,7 @@ export class DiceDetailService {
         throw new Error(messageResponse.diceDetail.transactionIsFinished);
         break;
     }
-    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.transaction, diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
+    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.id, diceDetail.transaction, diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
     return diceDetail.save();
   }
 
