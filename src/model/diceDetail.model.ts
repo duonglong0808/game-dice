@@ -19,6 +19,9 @@ export class DiceDetailModel extends Model {
   transaction: number;
 
   @Column({ type: DataType.INTEGER })
+  mainTransaction: number;
+
+  @Column({ type: DataType.INTEGER })
   totalRed: number;
 
   @Column({ type: DataType.INTEGER, defaultValue: StatusDiceDetail.prepare })
@@ -30,6 +33,9 @@ export class DiceDetailModel extends Model {
 
   @BelongsTo(() => GameDiceModel)
   gameDice: GameDiceModel;
+
+  @Column({ type: DataType.INTEGER })
+  dateId: number;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isDeleted: boolean;

@@ -2,8 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { TypeGameDice } from 'src/constants';
 
 export class CreateGameDiceDetailDto {
-  @ApiProperty({ name: 'transaction', type: Number, description: 'phiên' })
-  transaction: number;
+  @ApiProperty({ name: 'transaction', type: Number, description: 'phiên ở trang chính' })
+  mainTransaction: number;
+
+  @ApiProperty({ name: 'dateId', type: Number, description: 'Id duy nhất của ngày' })
+  dateId: number;
 
   @ApiProperty({ name: 'totalRed', type: Number, description: 'Số lượng đỏ' })
   totalRed: number;

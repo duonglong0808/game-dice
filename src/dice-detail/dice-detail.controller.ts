@@ -4,6 +4,7 @@ import { CreateGameDiceDetailDto } from './dto/create-dice-detail.dto';
 import { UpdateGameDiceDetailDto } from './dto/update-dice-detail.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiOperationCustom, BaseFilter } from 'src/custom-decorator';
+import { Public } from 'src/auth/decorators';
 
 @ApiTags('Dice Detail')
 @Controller('dice-detail')
@@ -11,6 +12,7 @@ export class DiceDetailController {
   constructor(private readonly diceDetailService: DiceDetailService) {}
 
   @Post()
+  @Public()
   @ApiOperationCustom('Dice Detail', 'POST')
   async create(@Body() dto: CreateGameDiceDetailDto) {
     try {

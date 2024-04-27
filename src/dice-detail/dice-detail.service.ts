@@ -22,13 +22,10 @@ export class DiceDetailService {
 
   async create(dto: CreateGameDiceDetailDto) {
     if (dto.totalRed > 4 || dto.totalRed <= 0) throw new Error(messageResponse.system.dataInvalid);
-    const [exit, dice] = await Promise.all([
-      //
-      this.gameDiceRepository.count({ transaction: dto.transaction, gameDiceId: dto.gameDiceId }),
-      this.diceService.checkExitByCondition({ id: dto.gameDiceId }),
-    ]);
-    if (exit != 0 || dice == 0) throw new Error(messageResponse.system.dataInvalid);
-    return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare });
+    const dice = await this.diceService.checkExitByCondition({ id: dto.gameDiceId });
+    if (dice == 0) throw new Error(messageResponse.system.dataInvalid);
+    const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
+    return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare, transaction: totalTransaction + 1 });
   }
 
   findAllCMS(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
