@@ -69,7 +69,7 @@ export class DiceDetailController {
     }
   }
 
-  @Patch('status/:id')
+  @Patch('/:id/status')
   @ApiOperationCustom('Dice Detail status', 'patch')
   async updateStatus(@Param('id') id: string) {
     try {

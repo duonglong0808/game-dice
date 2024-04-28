@@ -31,7 +31,7 @@ export class DiceDetailService {
   findAllCMS(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
     const filter: any = {};
     if (gameDiceId) filter.gameDiceId = gameDiceId;
-    return this.gameDiceRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'totalRed', 'status', 'gameDiceId'] });
+    return this.gameDiceRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt'] });
   }
 
   async findHistoryNear(gameDiceId: number) {
@@ -54,7 +54,7 @@ export class DiceDetailService {
   }
 
   findOne(id: number) {
-    return this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'totalRed', 'status', 'gameDiceId']);
+    return this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt']);
   }
 
   async update(id: number, dto: UpdateGameDiceDetailDto) {
@@ -66,7 +66,7 @@ export class DiceDetailService {
   }
 
   async updateStatus(id: number) {
-    const diceDetail = await this.findOne(id);
+    const diceDetail = await this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'gameDiceId', 'totalRed', 'status']);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
     const key = `dice-detail:${diceDetail.gameDiceId}:${diceDetail.id}:${diceDetail.transaction}`;
     switch (diceDetail.status) {
