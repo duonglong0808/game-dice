@@ -8,7 +8,7 @@ module.exports = {
       instances: 3,
       env: {
         NODE_ENV: 'development',
-        PORT: 9990,
+        PORT: 9991,
       },
     },
   ],
