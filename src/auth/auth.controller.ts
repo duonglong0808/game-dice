@@ -15,12 +15,12 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
-  @Public()
-  @Post('login')
-  @ApiOperationCustom('Login', 'post')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
-  }
+  // @Public()
+  // @Post('login')
+  // @ApiOperationCustom('Login', 'post')
+  // login(@Body() dto: LoginDto) {
+  //   return this.authService.login(dto);
+  // }
 
   @Get('userInfo')
   @ApiOperationCustom('Login', 'post')
@@ -35,26 +35,26 @@ export class AuthController {
     return this.authService.refreshToken(dto);
   }
 
-  @Public()
-  @Patch('forget-password/:id')
-  @ApiOperationCustom('Refresh token', 'post')
-  @ApiParam({
-    name: 'id',
-    description: 'Id người dùng',
-  })
-  forgetPassword(@Param('id') id: string) {
-    return this.authService.forgetPassword(id);
-  }
+  // @Public()
+  // @Patch('forget-password/:id')
+  // @ApiOperationCustom('Refresh token', 'post')
+  // @ApiParam({
+  //   name: 'id',
+  //   description: 'Id người dùng',
+  // })
+  // forgetPassword(@Param('id') id: string) {
+  //   return this.authService.forgetPassword(id);
+  // }
 
-  @Patch('send-sms/:id')
-  @ApiOperationCustom('Gửi mã các nhận', 'POST')
-  sendSmsConfirm(@Param('id') id: string) {
-    return this.authService.sendSmsConfirmByUserId(id);
-  }
+  // @Patch('send-sms/:id')
+  // @ApiOperationCustom('Gửi mã các nhận', 'POST')
+  // sendSmsConfirm(@Param('id') id: string) {
+  //   return this.authService.sendSmsConfirmByUserId(id);
+  // }
 
-  @Patch('confirm/:id')
-  @ApiOperationCustom('Xác nhận tài khoản', 'POST')
-  confirmAccount(@Param('id') id: string, @Body() dto: ConfirmAccountDto) {
-    return this.authService.confirmAccount(id, dto);
-  }
+  // @Patch('confirm/:id')
+  // @ApiOperationCustom('Xác nhận tài khoản', 'POST')
+  // confirmAccount(@Param('id') id: string, @Body() dto: ConfirmAccountDto) {
+  //   return this.authService.confirmAccount(id, dto);
+  // }
 }

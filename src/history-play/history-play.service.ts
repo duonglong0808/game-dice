@@ -17,24 +17,29 @@ export class HistoryPlayService {
     private readonly userPointService: UserPointService,
   ) {}
 
+  // Check vị trí
+  // {
+  // const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}:${dto.userId}`;
+  //   const dataRedis = await this.cacheService.hget(keyCheckBetPosition);
+  //   const dataAnswerUser = Object.keys(dataRedis);
+  //   if (dataAnswerUser.includes(String(dto.answer))) throw new Error(messageResponse.historyPlay.positionHasChoice);
+  //   // Trường hợp chọn các ô ngoài cl, tx thì chỉ dc chọn 1 ô
+  //   const rateHights = [TypeAnswerDice.p1, TypeAnswerDice.p2, TypeAnswerDice.p3, TypeAnswerDice.p8, TypeAnswerDice.p9, TypeAnswerDice.p10];
+  //   const answerHightRate = rateHights.includes(dto.answer);
+  //   const checkHasHightRate = rateHights.some((r) => dataAnswerUser.includes(String(r)));
+  //   if (answerHightRate && checkHasHightRate) {
+  //     throw new Error(messageResponse.historyPlay.cannotChooseAnswer);
+  //   }
+  // }
+
   async create(dto: CreateHistoryPlayDto) {
     if (dto.point <= 0) throw new Error(messageResponse.system.dataInvalid);
     const keyRunning = `dice-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
     const statusDice: string = await this.cacheService.get(keyRunning);
-    console.log('🚀 ~ HistoryPlayService ~ create ~ statusDice:', statusDice);
     if (+statusDice?.split(':')[0] != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
     // Check các option đã chơi
-    const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}:${dto.userId}`;
-    const dataRedis = await this.cacheService.hget(keyCheckBetPosition);
-    const dataAnswerUser = Object.keys(dataRedis);
-    if (dataAnswerUser.includes(String(dto.answer))) throw new Error(messageResponse.historyPlay.positionHasChoice);
-    // Trường hợp chọn các ô ngoài cl, tx thì chỉ dc chọn 1 ô
-    const rateHights = [TypeAnswerDice.p1, TypeAnswerDice.p2, TypeAnswerDice.p3, TypeAnswerDice.p8, TypeAnswerDice.p9, TypeAnswerDice.p10];
-    const answerHightRate = rateHights.includes(dto.answer);
-    const checkHasHightRate = rateHights.some((r) => dataAnswerUser.includes(String(r)));
-    if (answerHightRate && checkHasHightRate) {
-      throw new Error(messageResponse.historyPlay.cannotChooseAnswer);
-    }
+    const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}`;
+
     // trừ tiền
     const gamePointId = await this.checkBalanceAndDeductPoint('ku-casino', dto.userId, dto.point);
     if (!gamePointId) throw new Error(messageResponse.historyPlay.accountNotHaveEnoughPoints);

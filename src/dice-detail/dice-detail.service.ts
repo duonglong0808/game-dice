@@ -69,13 +69,15 @@ export class DiceDetailService {
     const diceDetail = await this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'gameDiceId', 'totalRed', 'status']);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
     const key = `dice-detail:${diceDetail.gameDiceId}:${diceDetail.id}:${diceDetail.transaction}`;
+    const date = new Date().getTime();
+    const countDown = 14 * 1000;
     switch (diceDetail.status) {
       case StatusDiceDetail.prepare:
         diceDetail.status = StatusDiceDetail.shake;
         await this.cacheService.set(key, StatusDiceDetail.shake);
         break;
       case StatusDiceDetail.shake:
-        await this.cacheService.set(key, `${StatusDiceDetail.bet}:${new Date().getTime()}`);
+        await this.cacheService.set(key, `${StatusDiceDetail.bet}:${date + countDown}`);
         // await this.cacheService.set(key, 1, 14);
         diceDetail.status = StatusDiceDetail.bet;
         break;
@@ -102,7 +104,7 @@ export class DiceDetailService {
         throw new Error(messageResponse.diceDetail.transactionIsFinished);
         break;
     }
-    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.id, diceDetail.transaction, diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
+    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.id, diceDetail.transaction, diceDetail.status == StatusDiceDetail.bet ? `${StatusDiceDetail.bet}:${date + countDown}` : diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
     return diceDetail.save();
   }
 
