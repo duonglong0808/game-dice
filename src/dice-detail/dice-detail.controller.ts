@@ -63,7 +63,7 @@ export class DiceDetailController {
   @ApiOperationCustom('Dice Detail', 'patch')
   async update(@Param('id') id: string, @Body() dto: UpdateGameDiceDetailDto) {
     try {
-      return await this.diceDetailService.update(+id, dto);
+      return await this.diceDetailService.update(+id, dto, true);
     } catch (error) {
       throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
     }

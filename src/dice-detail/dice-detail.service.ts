@@ -21,11 +21,17 @@ export class DiceDetailService {
   ) {}
 
   async create(dto: CreateGameDiceDetailDto) {
-    if (dto.totalRed > 4 || dto.totalRed <= 0) throw new Error(messageResponse.system.dataInvalid);
-    const dice = await this.diceService.checkExitByCondition({ id: dto.gameDiceId });
-    if (dice == 0) throw new Error(messageResponse.system.dataInvalid);
-    const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
-    return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare, transaction: totalTransaction + 1 });
+    if (!dto.dateId || !dto.gameDiceId || !dto.mainTransaction) throw new Error(messageResponse.system.missingData);
+    const checkExit = await this.gameDiceRepository.findOneByCondition({ dateId: dto.dateId, mainTransaction: dto.mainTransaction, gameDiceId: dto.gameDiceId });
+    if (checkExit) {
+      return this.update(checkExit.id, dto);
+    } else {
+      if (dto.totalRed && (dto.totalRed > 4 || dto.totalRed <= 0)) throw new Error(messageResponse.system.dataInvalid);
+      const dice = await this.diceService.checkExitByCondition({ id: dto.gameDiceId });
+      if (dice == 0) throw new Error(messageResponse.system.dataInvalid);
+      const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
+      return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare, transaction: totalTransaction + 1 });
+    }
   }
 
   findAllCMS(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
@@ -57,9 +63,12 @@ export class DiceDetailService {
     return this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt']);
   }
 
-  async update(id: number, dto: UpdateGameDiceDetailDto) {
+  async update(id: number, dto: UpdateGameDiceDetailDto, checkDto?: boolean) {
     const diceDetail = await this.findOne(id);
-    if (diceDetail && diceDetail.status != StatusDiceDetail.prepare) throw Error(messageResponse.diceDetail.transactionIsRunning);
+    if (checkDto) {
+      if (!diceDetail) throw Error(messageResponse.system.idInvalid);
+      if (diceDetail.status >= StatusDiceDetail.check) throw Error(messageResponse.diceDetail.transactionIsRunning);
+    }
     const update = await this.gameDiceRepository.findByIdAndUpdate(id, dto);
     if (!update) throw Error(messageResponse.system.badRequest);
     return update;
@@ -105,7 +114,19 @@ export class DiceDetailService {
         break;
     }
     await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.id, diceDetail.transaction, diceDetail.status == StatusDiceDetail.bet ? `${StatusDiceDetail.bet}:${date + countDown}` : diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
-    return diceDetail.save();
+    await diceDetail.save();
+
+    if (diceDetail.status == StatusDiceDetail.check) {
+      const createDto: CreateGameDiceDetailDto = {
+        dateId: diceDetail.dateId,
+        gameDiceId: diceDetail.gameDiceId,
+        mainTransaction: diceDetail.mainTransaction + 1,
+        totalRed: null,
+      };
+      await this.create(createDto);
+    }
+
+    return diceDetail;
   }
 
   async remove(id: number) {
