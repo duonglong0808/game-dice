@@ -26,7 +26,9 @@ export class DiceDetailService {
     if (checkExit) {
       return this.update(checkExit.id, dto);
     } else {
-      if (dto.totalRed && (dto.totalRed > 4 || dto.totalRed <= 0)) throw new Error(messageResponse.system.dataInvalid);
+      if (dto.totalRed) {
+        if (dto.totalRed > 4 || dto.totalRed <= 0) throw new Error(messageResponse.system.dataInvalid);
+      }
       const dice = await this.diceService.checkExitByCondition({ id: dto.gameDiceId });
       if (dice == 0) throw new Error(messageResponse.system.dataInvalid);
       const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
@@ -116,15 +118,15 @@ export class DiceDetailService {
     await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.id, diceDetail.transaction, diceDetail.status == StatusDiceDetail.bet ? `${StatusDiceDetail.bet}:${date + countDown}` : diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
     await diceDetail.save();
 
-    if (diceDetail.status == StatusDiceDetail.check) {
-      const createDto: CreateGameDiceDetailDto = {
-        dateId: diceDetail.dateId,
-        gameDiceId: diceDetail.gameDiceId,
-        mainTransaction: diceDetail.mainTransaction + 1,
-        totalRed: null,
-      };
-      await this.create(createDto);
-    }
+    // if (diceDetail.status == StatusDiceDetail.check) {
+    //   const createDto: CreateGameDiceDetailDto = {
+    //     dateId: diceDetail.dateId,
+    //     gameDiceId: diceDetail.gameDiceId,
+    //     mainTransaction: diceDetail.mainTransaction + 1,
+    //     totalRed: null,
+    //   };
+    //   await this.create(createDto);
+    // }
 
     return diceDetail;
   }
