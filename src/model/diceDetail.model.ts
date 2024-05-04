@@ -10,6 +10,7 @@ import { StatusDiceDetail } from 'src/constants';
     { name: 'gameDiceId_index', fields: ['gameDiceId'] },
     { name: 'transaction_index', fields: ['transaction'] },
     { name: 'dateId_index', fields: ['dateId'] },
+    { name: 'mainTransaction_index', fields: ['mainTransaction'] },
   ],
 })
 export class DiceDetailModel extends Model {

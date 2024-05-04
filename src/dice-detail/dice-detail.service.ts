@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateGameDiceDetailDto } from './dto/create-dice-detail.dto';
-import { UpdateGameDiceDetailDto, UpdateStatusDiceDetailDto } from './dto/update-dice-detail.dto';
+import { UpdateGameDiceDetailDto, UpdateStatusDiceDetailBotDto, UpdateStatusDiceDetailDto } from './dto/update-dice-detail.dto';
 import { DiceDetailRepositoryInterface } from './interface/dice-detail.interface';
 import { StatusDiceDetail, messageResponse } from 'src/constants';
 import { Pagination } from 'src/middlewares';
@@ -8,6 +8,7 @@ import { DiceService } from 'src/dice/dice.service';
 import { RedisService } from 'src/cache/redis.service';
 import { BullQueueService } from 'src/bull-queue/bullqueue.service';
 import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
+import { formatDateToId } from 'src/utils';
 
 @Injectable()
 export class DiceDetailService {
@@ -22,18 +23,13 @@ export class DiceDetailService {
 
   async create(dto: CreateGameDiceDetailDto) {
     if (!dto.dateId || !dto.gameDiceId || !dto.mainTransaction) throw new Error(messageResponse.system.missingData);
-    const checkExit = await this.gameDiceRepository.findOneByCondition({ dateId: dto.dateId, mainTransaction: dto.mainTransaction, gameDiceId: dto.gameDiceId });
-    if (checkExit) {
-      return this.update(checkExit.id, dto);
-    } else {
-      if (dto.totalRed) {
-        if (dto.totalRed > 4 || dto.totalRed <= 0) throw new Error(messageResponse.system.dataInvalid);
-      }
-      const dice = await this.diceService.checkExitByCondition({ id: dto.gameDiceId });
-      if (dice == 0) throw new Error(messageResponse.system.dataInvalid);
-      const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
-      return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare, transaction: totalTransaction + 1 });
+    if (dto.totalRed) {
+      if (dto.totalRed > 4 || dto.totalRed <= 0) throw new Error(messageResponse.system.dataInvalid);
     }
+    const dice = await this.diceService.checkExitByCondition({ id: dto.gameDiceId });
+    if (dice == 0) throw new Error(messageResponse.system.dataInvalid);
+    const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
+    return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare, transaction: totalTransaction + 1 });
   }
 
   findAllCMS(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
@@ -95,6 +91,28 @@ export class DiceDetailService {
     return update;
   }
 
+  async updateStatusAndAnswersBOT(dto: UpdateStatusDiceDetailBotDto) {
+    const diceDetail = await this.gameDiceRepository.findOneByCondition({
+      gameDiceId: dto.gameDiceId,
+      mainTransaction: dto.mainTransaction,
+    });
+    if (diceDetail) {
+      return this.updateStatus(diceDetail.id, { totalRed: dto.totalRed });
+    } else {
+      const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
+      const createDto = {
+        dateId: +formatDateToId(),
+        gameDiceId: dto.gameDiceId,
+        mainTransaction: dto.mainTransaction,
+        totalRed: dto.totalRed,
+        status: StatusDiceDetail.waitOpen,
+        transaction: totalTransaction + 1,
+      };
+      const newDice = await this.gameDiceRepository.create(createDto);
+      return this.updateStatus(newDice.id);
+    }
+  }
+
   async updateStatus(id: number, dto?: UpdateStatusDiceDetailDto) {
     const diceDetail = await this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'gameDiceId', 'totalRed', 'status']);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
@@ -141,19 +159,23 @@ export class DiceDetailService {
     // Auto update and create new dice transaction
     const timeDelay = this.getTimeDelayQueueUpdateStatus(diceDetail.status);
     if (timeDelay) {
+      console.log('🚀 ~ DiceDetailService ~ updateStatus ~ diceDetail.status:', diceDetail.status);
       if (diceDetail.status == StatusDiceDetail.end) {
+        console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
         const createDto: CreateGameDiceDetailDto = {
           dateId: diceDetail.dateId,
           gameDiceId: diceDetail.gameDiceId,
           mainTransaction: diceDetail.mainTransaction + 1,
           totalRed: null,
         };
+        console.log('🚀 ~ DiceDetailService ~ updateStatus ~ createDto:', createDto);
         const newDiceDetail = await this.create(createDto);
         console.log('🛫🛫🛫 ~ file: dice-detail.service.ts:152 ~ updateStatus ~ newDiceDetail:', newDiceDetail);
 
-        this.bullQueueService.addToQueueAutoUpdateStatusDice({ diceDetailId: newDiceDetail.id }, timeDelay);
+        // this.bullQueueService.addToQueueAutoUpdateStatusDice({ diceDetailId: newDiceDetail.id }, 5);
       } else {
-        this.bullQueueService.addToQueueAutoUpdateStatusDice({ diceDetailId: diceDetail.id }, timeDelay);
+        console.log('Để nguyên');
+        // this.bullQueueService.addToQueueAutoUpdateStatusDice({ diceDetailId: diceDetail.id }, timeDelay);
       }
     }
 
