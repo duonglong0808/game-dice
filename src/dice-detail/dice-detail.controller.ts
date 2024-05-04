@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { DiceDetailService } from './dice-detail.service';
 import { CreateGameDiceDetailDto } from './dto/create-dice-detail.dto';
-import { UpdateGameDiceDetailDto } from './dto/update-dice-detail.dto';
+import { UpdateGameDiceDetailDto, UpdateStatusDiceDetailDto } from './dto/update-dice-detail.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiOperationCustom, BaseFilter } from 'src/custom-decorator';
 import { Public } from 'src/auth/decorators';
@@ -71,9 +71,9 @@ export class DiceDetailController {
 
   @Patch('/:id/status')
   @ApiOperationCustom('Dice Detail status', 'patch')
-  async updateStatus(@Param('id') id: string) {
+  async updateStatus(@Param('id') id: string, @Body() dto: UpdateStatusDiceDetailDto) {
     try {
-      return await this.diceDetailService.updateStatus(+id);
+      return await this.diceDetailService.updateStatus(+id, dto);
     } catch (error) {
       throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
     }

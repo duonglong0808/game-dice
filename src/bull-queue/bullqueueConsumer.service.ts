@@ -1,11 +1,13 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import { Sequelize } from 'sequelize';
-import { DataJobAddPointToUser, DataJobCalcPointDice, TypeAnswerDice, TypeUpdatePointUser } from 'src/constants';
+import { TypeAnswerDice, TypeUpdatePointUser } from 'src/constants';
 import { HistoryPlayService } from 'src/history-play/history-play.service';
 import { BullQueueService } from './bullqueue.service';
 import { UserPointService } from 'src/user-point/user-point.service';
 import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
+import { DataJobAddPointToUser, DataJobCalcPointDice, DataJobAutoUpdateStatusDice } from './dto/interface';
+import { DiceDetailService } from 'src/dice-detail/dice-detail.service';
 
 @Processor('calc-point-dice')
 export class BullQueueConsumerServiceCalcPointDice {
@@ -196,5 +198,17 @@ export class BullQueueConsumerServiceAddPointToUser {
     if (dataFailed.length) {
       await this.bullQueueService.addToQueueAddPointToUser(dataFailed);
     }
+  }
+}
+
+@Processor('auto-update-status-dice')
+export class BullQueueConsumerServiceUpdateStatusDice {
+  constructor(private readonly diceDetailService: DiceDetailService) {}
+
+  @Process()
+  async updateStatusDice(job: Job<DataJobAutoUpdateStatusDice>) {
+    const { data } = job;
+    console.log('🛫🛫🛫 ~ file: bullqueueConsumer.service.ts:211 ~ updateStatusDice ~ data:', data, new Date().getTime());
+    return this.diceDetailService.updateStatus(data.diceDetailId);
   }
 }

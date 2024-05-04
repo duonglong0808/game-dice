@@ -29,6 +29,7 @@ import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.servic
       provide: 'DiceDetailRepositoryInterface',
       useClass: DiceDetailRepository,
     },
+    DiceService,
   ],
 })
 export class DiceDetailModule {}

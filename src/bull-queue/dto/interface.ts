@@ -10,3 +10,7 @@ export interface DataJobAddPointToUser {
   points: number;
   type: number;
 }
+
+export interface DataJobAutoUpdateStatusDice {
+  diceDetailId: number;
+}

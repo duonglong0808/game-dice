@@ -63,4 +63,3 @@ export const TypeUpdatePointUser = {
 };
 
 export * from './message';
-export * from './interface';

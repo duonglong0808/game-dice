@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
-import { DataJobAddPointToUser } from 'src/constants';
+import { DataJobAddPointToUser } from 'src/bull-queue/dto/interface';
 
 @Injectable()
 export class UserPointService {

@@ -1,8 +1,8 @@
 import { BullModule } from '@nestjs/bull';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
-import { BullQueueConsumerServiceAddPointToUser, BullQueueConsumerServiceCalcPointDice } from './bullqueueConsumer.service';
+import { BullQueueConsumerServiceAddPointToUser, BullQueueConsumerServiceCalcPointDice, BullQueueConsumerServiceUpdateStatusDice } from './bullqueueConsumer.service';
 import { BullQueueService } from './bullqueue.service';
 import { HistoryPlayModule } from 'src/history-play/history-play.module';
 import { HistoryPlayService } from 'src/history-play/history-play.service';
@@ -12,6 +12,8 @@ import { RedisService } from 'src/cache/redis.service';
 import { GamePointModule } from 'src/game-point/game-point.module';
 import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
 import { HttpModule } from '@nestjs/axios';
+import { DiceDetailModule } from 'src/dice-detail/dice-detail.module';
+import { DiceDetailService } from 'src/dice-detail/dice-detail.service';
 
 @Module({
   imports: [
@@ -50,20 +52,26 @@ import { HttpModule } from '@nestjs/axios';
       {
         name: 'add-point-to-user',
       },
+      {
+        name: 'auto-update-status-dice',
+      },
     ),
     HistoryPlayModule,
     UserPointModule,
     GamePointModule,
+    forwardRef(() => DiceDetailModule),
   ],
   providers: [
     //
     BullQueueConsumerServiceCalcPointDice,
     BullQueueConsumerServiceAddPointToUser,
+    BullQueueConsumerServiceUpdateStatusDice,
     BullQueueService,
     HistoryPlayService,
     UserPointService,
     RedisService,
     SendMessageWsService,
+    DiceDetailService,
   ],
   exports: [BullQueueService],
 })
