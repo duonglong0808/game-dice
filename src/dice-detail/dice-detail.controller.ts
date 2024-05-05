@@ -80,6 +80,7 @@ export class DiceDetailController {
   }
 
   @Post('bot')
+  @Public()
   @ApiOperationCustom('Dice Detail status', 'patch')
   async updateResultBot(@Body() dto: UpdateStatusDiceDetailBotDto) {
     try {
