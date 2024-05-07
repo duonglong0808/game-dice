@@ -99,10 +99,10 @@ export class DiceDetailService {
       dateId,
     });
     if (diceDetail) {
-      console.log('Đã có');
+      // console.log('Đã có');
       return this.updateStatus(diceDetail.id, { totalRed: dto.totalRed });
     } else {
-      console.log('tạo mới', dto);
+      // console.log('tạo mới', dto);
       const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
       const createDto = {
         dateId,
@@ -145,7 +145,7 @@ export class DiceDetailService {
         await this.cacheService.set(key, StatusDiceDetail.check);
         diceDetail.status = StatusDiceDetail.check;
         console.log('🛫🛫🛫 ~ file: dice-detail.service.ts:126 ~ updateStatus ~ dto:', dto);
-        if (dto?.totalRed) diceDetail.totalRed = dto.totalRed;
+        if (dto?.totalRed >= 0) diceDetail.totalRed = dto.totalRed;
         break;
       case StatusDiceDetail.check:
         await this.cacheService.delete(key);
