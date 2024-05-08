@@ -49,6 +49,12 @@ export abstract class BaseRepositoryAbstract<T extends Model> implements BaseRep
     };
   }
 
+  updateMany(condition: object, dto: Partial<T>): Promise<any> {
+    return this.model.update(dto, {
+      where: condition as WhereOptions,
+    });
+  }
+
   async findOneAndUpdate(condition: object, dto: Partial<T>): Promise<T | null> {
     // Tìm bản ghi cần cập nhật dựa trên điều kiện
     const item: T | null = await this.findOneByCondition(condition);

@@ -24,4 +24,6 @@ export interface BaseRepositoryInterface<T> {
   // insertMany(items: T[]): Promise<T[]>;
 
   count(condition?: object): Promise<number>;
+
+  updateMany(condition: object, dto: Partial<T>): Promise<T>;
 }

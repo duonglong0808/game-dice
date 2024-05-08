@@ -6,6 +6,7 @@ import { RedisService } from 'src/cache/redis.service';
 import { StatusDiceDetail, TypeAnswerDice, messageResponse } from 'src/constants';
 import { GamePointService } from 'src/game-point/game-point.service';
 import { UserPointService } from 'src/user-point/user-point.service';
+import { Pagination } from 'src/middlewares';
 
 @Injectable()
 export class HistoryPlayService {
@@ -17,7 +18,7 @@ export class HistoryPlayService {
     private readonly userPointService: UserPointService,
   ) {}
 
-  // Check vị trí
+  // Check vị trí ddax choiw
   // {
   // const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}:${dto.userId}`;
   //   const dataRedis = await this.cacheService.hget(keyCheckBetPosition);
@@ -59,13 +60,32 @@ export class HistoryPlayService {
     return null;
   }
 
-  findAll(transaction: number, diceDetailId: number) {
+  findAllByDiceDetailId(diceDetailId: number) {
     return this.historyPlayRepository.findAll(
-      { transaction, diceDetailId },
+      { diceDetailId },
       {
         projection: ['id', 'userId', 'gamePointId', 'point', 'answer'],
       },
     );
+  }
+
+  findAllCms(pagination: Pagination, diceDetailId: number, gameDiceId: number, userId: number, sort?: string, typeSort?: string) {
+    const filter: any = {};
+    if (diceDetailId) filter.diceDetailId = diceDetailId;
+    if (gameDiceId) filter.gameDiceId = gameDiceId;
+    if (userId) filter.userId = userId;
+
+    return this.historyPlayRepository.findAll(filter, {
+      //
+      sort,
+      typeSort,
+      ...pagination,
+      projection: ['id', 'answer', 'point', 'status', 'gameDiceId', 'diceDetailId', 'userId', 'createdAt'],
+    });
+  }
+
+  updateStatusByDiceDetailId(diceDetailId: number, status: number) {
+    return this.historyPlayRepository.updateMany({ diceDetailId }, { status: status });
   }
 
   remove(id: number) {

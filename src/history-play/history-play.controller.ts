@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus, Req, Query } from '@nestjs/common';
 import { HistoryPlayService } from './history-play.service';
 import { CreateHistoryPlayDto } from './dto/create-history-play.dto';
 import { UpdateHistoryPlayDto } from './dto/update-history-play.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiOperationCustom } from 'src/custom-decorator';
 
 @ApiTags('History Play')
@@ -23,10 +23,30 @@ export class HistoryPlayController {
     }
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.historyPlayService.findAll();
-  // }
+  @Get()
+  @ApiQuery({
+    name: 'userId',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'gameDiceId',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'diceDetailId',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'sort',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'typeSort',
+    type: String,
+  })
+  findAll(@Req() req: any, @Query('userId') userId: number, @Query('gameDiceId') gameDiceId: number, @Query('diceDetailId') diceDetailId: number, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
+    return this.historyPlayService.findAllCms(req['pagination'], diceDetailId, gameDiceId, userId, sort, typeSort);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

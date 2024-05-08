@@ -1,13 +1,13 @@
 import { BeforeCount, BeforeFind, BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import { DataType } from 'sequelize-typescript';
-import { DiceDetailModel, addConditionNotDelete } from '.';
+import { DiceDetailModel, GameDiceModel, addConditionNotDelete } from '.';
 import { StatusHistoryPlayDice } from 'src/constants';
 
 @Table({
   tableName: 'HistoryPlayDices',
   timestamps: true,
   indexes: [
-    { name: 'transaction_index', fields: ['transaction'] },
+    { name: 'gameDiceId_index', fields: ['gameDiceId'] },
     { name: 'diceDetailId_index', fields: ['diceDetailId'] },
   ],
 })
@@ -21,8 +21,8 @@ export class HistoryPlayDiceModel extends Model {
   @Column({ type: DataType.INTEGER })
   gamePointId: number;
 
-  @Column({ type: DataType.INTEGER })
-  transaction: number;
+  // @Column({ type: DataType.INTEGER })
+  // transaction: number;
 
   @Column({ type: DataType.INTEGER })
   answer: number;
@@ -32,6 +32,13 @@ export class HistoryPlayDiceModel extends Model {
 
   @Column({ type: DataType.INTEGER, defaultValue: StatusHistoryPlayDice.wait })
   status: number;
+
+  @ForeignKey(() => GameDiceModel)
+  @Column
+  gameDiceId: number;
+
+  @BelongsTo(() => GameDiceModel)
+  gameDice: GameDiceModel;
 
   @ForeignKey(() => DiceDetailModel)
   @Column

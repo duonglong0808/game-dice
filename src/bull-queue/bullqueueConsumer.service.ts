@@ -21,8 +21,8 @@ export class BullQueueConsumerServiceCalcPointDice {
   async calcPointDice(job: Job<DataJobCalcPointDice>) {
     // console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ job:', job);
     const data = job.data;
-    const { diceDetailId, transactionId, totalRed } = data;
-    const { data: listUser } = await this.historyPlayService.findAll(transactionId, diceDetailId);
+    const { diceDetailId, totalRed } = data;
+    const { data: listUser } = await this.historyPlayService.findAllByDiceDetailId(diceDetailId);
     const dataUserUpPoint: DataJobAddPointToUser[] = [];
     if (totalRed == 0 || totalRed == 4) {
       listUser.forEach((userAnswer) => {
@@ -167,7 +167,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         }
       });
     }
-
+    this.historyPlayService.updateStatusByDiceDetailId(data.diceDetailId, 1);
     return this.updatePointUserAndSendWs(dataUserUpPoint);
   }
 
