@@ -126,14 +126,14 @@ export class DiceDetailService {
     switch (diceDetail.status) {
       case StatusDiceDetail.prepare:
         diceDetail.status = StatusDiceDetail.shake;
-        await this.cacheService.set(key, StatusDiceDetail.shake);
+        await this.cacheService.set(key, StatusDiceDetail.shake, 10);
         break;
       case StatusDiceDetail.shake:
-        await this.cacheService.set(key, `${StatusDiceDetail.bet}:${date + countDown}`);
+        await this.cacheService.set(key, `${StatusDiceDetail.bet}:${date + countDown}`, 15);
         diceDetail.status = StatusDiceDetail.bet;
         break;
       case StatusDiceDetail.bet:
-        await this.cacheService.set(key, StatusDiceDetail.waitOpen);
+        await this.cacheService.set(key, StatusDiceDetail.waitOpen, 60);
         diceDetail.status = StatusDiceDetail.waitOpen;
         // Delete keys
         const keyPlayer = `dice-play:${diceDetail.gameDiceId}:${diceDetail.transaction}:`;
@@ -142,14 +142,14 @@ export class DiceDetailService {
         this.cacheService.deleteMany(keys);
         break;
       case StatusDiceDetail.waitOpen:
-        await this.cacheService.set(key, StatusDiceDetail.check);
+        await this.cacheService.set(key, StatusDiceDetail.check, 20);
         diceDetail.status = StatusDiceDetail.check;
         console.log('🛫🛫🛫 ~ file: dice-detail.service.ts:126 ~ updateStatus ~ dto:', dto);
         if (dto?.totalRed >= 0) diceDetail.totalRed = dto.totalRed;
+        this.bullQueueService.addToQueueCalcPointDice({ diceDetailId: diceDetail.id, totalRed: diceDetail.totalRed, transactionId: diceDetail.transaction });
         break;
       case StatusDiceDetail.check:
         await this.cacheService.delete(key);
-        this.bullQueueService.addToQueueCalcPointDice({ diceDetailId: diceDetail.id, totalRed: diceDetail.totalRed, transactionId: diceDetail.transaction });
         diceDetail.status = StatusDiceDetail.end;
         break;
 
