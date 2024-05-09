@@ -21,11 +21,11 @@ export class DiceService {
   }
 
   findAll(pagination: Pagination, sort?: string, typeSort?: string) {
-    return this.gameDiceRepository.findAll({}, { sort, typeSort, ...pagination, projection: ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive'] });
+    return this.gameDiceRepository.findAll({}, { sort, typeSort, ...pagination, projection: ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive', 'idChat'] });
   }
 
   findOne(id: number) {
-    return this.gameDiceRepository.findOneById(id, ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive']);
+    return this.gameDiceRepository.findOneById(id, ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive', 'idChat']);
   }
 
   async update(id: number, dto: UpdateGameDiceDto) {

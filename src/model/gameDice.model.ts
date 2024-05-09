@@ -29,6 +29,9 @@ export class GameDiceModel extends Model {
   @Column({ type: DataType.STRING, unique: true })
   idLive: string;
 
+  @Column({ type: DataType.STRING })
+  idChat: string;
+
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isDeleted: boolean;
 

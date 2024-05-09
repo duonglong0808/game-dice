@@ -17,6 +17,9 @@ export class CreateGameDiceDto {
   @ApiProperty({ name: 'idLive', type: String, description: 'id live ', example: 'okgd' })
   idLive: string;
 
+  @ApiProperty({ name: 'idChat', type: String, description: 'link chat ', example: 'okgd' })
+  idChat: string;
+
   @ApiProperty({ name: 'nationalAuthor', type: String, description: 'id live ', example: 'okgd' })
   nationalAuthor: string;
 }
