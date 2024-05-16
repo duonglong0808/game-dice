@@ -47,7 +47,7 @@ export class DiceDetailController {
   @ApiOperationCustom('Dice Detail for user', 'get')
   findAll(@Query('gameDiceId') gameDiceId: number) {
     try {
-      return this.diceDetailService.findHistoryNear(gameDiceId);
+      return this.diceDetailService.findHistoryNear();
     } catch (error) {
       throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
     }

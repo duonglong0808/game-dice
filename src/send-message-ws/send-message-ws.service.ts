@@ -5,12 +5,13 @@ import { Injectable } from '@nestjs/common';
 export class SendMessageWsService {
   constructor(private readonly httpService: HttpService) {}
 
-  updateStatusDice(gameDiceId: number, diceDetailId: number, transaction: number, status: number | string, totalRed: number) {
+  updateStatusDice(gameDiceId: number, diceDetailId: number, transaction: number, mainTransaction: number, status: number | string, totalRed: number) {
     try {
       return this.httpService.axiosRef.post(`${process.env.API_WSK}/dice/status`, {
         gameDiceId,
         diceDetailId,
         transaction,
+        mainTransaction,
         status,
         totalRed,
       });

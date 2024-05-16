@@ -9,6 +9,7 @@ import { RedisService } from 'src/cache/redis.service';
 import { BullQueueService } from 'src/bull-queue/bullqueue.service';
 import { SendMessageWsService } from 'src/send-message-ws/send-message-ws.service';
 import { formatDateToId } from 'src/utils';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class DiceDetailService {
@@ -38,22 +39,23 @@ export class DiceDetailService {
     return this.gameDiceRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt'] });
   }
 
-  async findHistoryNear(gameDiceId: number) {
+  async findHistoryNear() {
     const { data: dataHistory } = await this.gameDiceRepository.findAll(
       {
-        gameDiceId,
         status: StatusDiceDetail.end,
+        totalRed: { [Op.ne]: null },
+        mainTransaction: { [Op.ne]: null },
       },
       {
-        limit: 10,
+        limit: 240,
         sort: 'transaction',
         typeSort: 'ASC',
       },
     );
-    const { data: transactionNow } = await this.gameDiceRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
+    // const { data: transactionNow } = await this.gameDiceRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
     return {
       dataHistory,
-      transactionNow,
+      // transactionNow,
     };
   }
 
@@ -157,7 +159,7 @@ export class DiceDetailService {
         throw new Error(messageResponse.diceDetail.transactionIsFinished);
         break;
     }
-    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.id, diceDetail.transaction, diceDetail.status == StatusDiceDetail.bet ? `${StatusDiceDetail.bet}:${date + countDown}` : diceDetail.status, diceDetail.status == StatusDiceDetail.check && diceDetail.totalRed);
+    await this.sendMessageWsService.updateStatusDice(diceDetail.gameDiceId, diceDetail.id, diceDetail.transaction, diceDetail.mainTransaction, diceDetail.status == StatusDiceDetail.bet ? `${StatusDiceDetail.bet}:${date + countDown}` : diceDetail.status, diceDetail.status >= StatusDiceDetail.check && diceDetail.totalRed);
     await diceDetail.save();
 
     // Auto update and create new dice transaction
