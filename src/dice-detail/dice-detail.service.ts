@@ -48,8 +48,8 @@ export class DiceDetailService {
       },
       {
         limit: 240,
-        sort: 'transaction',
-        typeSort: 'ASC',
+        sort: 'id',
+        typeSort: 'DESC',
       },
     );
     // const { data: transactionNow } = await this.gameDiceRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
