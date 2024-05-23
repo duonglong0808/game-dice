@@ -26,7 +26,7 @@ export class GameDiceModel extends Model {
   @Column({ type: DataType.STRING })
   nationalAuthor: string;
 
-  @Column({ type: DataType.STRING, unique: true })
+  @Column({ type: DataType.STRING })
   idLive: string;
 
   @Column({ type: DataType.STRING })
