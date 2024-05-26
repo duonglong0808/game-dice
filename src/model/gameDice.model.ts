@@ -30,6 +30,9 @@ export class GameDiceModel extends Model {
   idLive: string;
 
   @Column({ type: DataType.STRING })
+  idLiveMobile: string;
+
+  @Column({ type: DataType.STRING })
   idChat: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })

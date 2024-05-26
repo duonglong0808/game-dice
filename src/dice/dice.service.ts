@@ -21,7 +21,7 @@ export class DiceService {
   }
 
   findAll(pagination: Pagination, sort?: string, typeSort?: string) {
-    return this.gameDiceRepository.findAll({}, { sort, typeSort, ...pagination, projection: ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive', 'idChat'] });
+    return this.gameDiceRepository.findAll({}, { sort, typeSort, ...pagination, projection: ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive', 'idLiveMobile', 'idChat'] });
   }
 
   findOne(id: number) {
