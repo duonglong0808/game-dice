@@ -36,38 +36,6 @@ console.log(__dirname);
         timeout: 5000,
       }),
     }),
-    MailerModule.forRootAsync({
-      // imports: [ConfigModule], // import module if not enabled globally
-      useFactory: async (config: ConfigService) => ({
-        // transport: config.get("MAIL_TRANSPORT"),
-        // or
-        transport: {
-          host: process.env.MAIL_HOST,
-          port: +process.env.MAIL_PORT,
-          service: 'Gmail',
-          secure: true,
-          auth: {
-            user: process.env.MAIL_USER,
-            pass: process.env.MAIL_PASSWORD,
-          },
-          tls: {
-            // do not fail on invalid certs
-            rejectUnauthorized: false,
-          },
-        },
-        defaults: {
-          from: `"No Reply" <${process.env.MAIL_FROM}>`,
-        },
-
-        template: {
-          dir: join(__dirname, 'templates'),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
-          },
-        },
-      }),
-    }),
     // Connect to Models
     SequelizeModule.forRoot({
       dialect: process.env.DATABASE_DIALECT as Dialect,
@@ -113,7 +81,6 @@ console.log(__dirname);
     FirebaseService,
     RedisService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
-    SendMailService,
   ],
 })
 export class AppModule implements NestModule {

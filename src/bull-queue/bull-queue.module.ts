@@ -22,7 +22,7 @@ import { DiceDetailService } from 'src/dice-detail/dice-detail.service';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        prefix: `{${process.env.APP_ID}}`,
+        prefix: `{bull-queue}:${process.env.APP_ID}:${process.env.APP_NAME}`,
         createClient: (type) => {
           const opts = type !== 'client' ? { enableReadyCheck: false, maxRetriesPerRequest: null } : {};
 

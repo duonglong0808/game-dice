@@ -88,6 +88,10 @@ export class HistoryPlayService {
     return this.historyPlayRepository.updateMany({ diceDetailId }, { status: status });
   }
 
+  update(id: number, dto: any) {
+    return this.historyPlayRepository.findByIdAndUpdate(id, dto);
+  }
+
   remove(id: number) {
     return `This action removes a #${id} historyPlay`;
   }

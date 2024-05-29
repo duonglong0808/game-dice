@@ -48,6 +48,11 @@ export class HistoryPlayController {
     return this.historyPlayService.findAllCms(req['pagination'], diceDetailId, gameDiceId, userId, sort, typeSort);
   }
 
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: any) {
+    return this.historyPlayService.update(+id, dto);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.historyPlayService.remove(+id);

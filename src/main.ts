@@ -30,9 +30,9 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
 
   // Swagger API
-  const config = new DocumentBuilder().setTitle('Chat Api').setDescription('The Chat API description').setVersion('1.0').addBearerAuth().build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/doc/swagger', app, document);
+  // const config = new DocumentBuilder().setTitle('Chat Api').setDescription('The Chat API description').setVersion('1.0').addBearerAuth().build();
+  // const document = SwaggerModule.createDocument(app, config);
+  // SwaggerModule.setup('api/doc/swagger', app, document);
 
   await app.listen(process.env.PORT, () => console.log('App listening on port ' + process.env.PORT));
 }
