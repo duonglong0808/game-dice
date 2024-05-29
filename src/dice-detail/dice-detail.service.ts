@@ -122,7 +122,7 @@ export class DiceDetailService {
   async updateStatus(id: number, dto?: UpdateStatusDiceDetailDto) {
     const diceDetail = await this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'gameDiceId', 'totalRed', 'status']);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
-    const key = `dice-detail:${diceDetail.gameDiceId}:${diceDetail.id}:${diceDetail.transaction}`;
+    const key = `${process.env.APP_NAME}:dice-detail:${diceDetail.gameDiceId}:${diceDetail.id}:${diceDetail.transaction}`;
     const date = new Date().getTime();
     const countDown = 14 * 1000;
     switch (diceDetail.status) {

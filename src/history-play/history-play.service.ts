@@ -35,7 +35,7 @@ export class HistoryPlayService {
 
   async create(dto: CreateHistoryPlayDto) {
     if (dto.point <= 0) throw new Error(messageResponse.system.dataInvalid);
-    const keyRunning = `dice-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
+    const keyRunning = `${process.env.APP_NAME}:dice-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
     const statusDice: string = await this.cacheService.get(keyRunning);
     if (+statusDice?.split(':')[0] != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
     // Check các option đã chơi
