@@ -26,7 +26,7 @@ export class BullQueueConsumerServiceCalcPointDice {
     const dataUserUpPoint: DataJobAddPointToUser[] = [];
     if (totalRed == 0 || totalRed == 4) {
       listUser.forEach((userAnswer) => {
-        if (userAnswer.answer == TypeAnswerDice.p1) {
+        if (userAnswer.answer == TypeAnswerDice.p1 && totalRed == 0) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 14;
           if (user) user.points += points;
@@ -37,7 +37,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               points,
               type: TypeUpdatePointUser.up,
             });
-        } else if (userAnswer.answer == TypeAnswerDice.p8) {
+        } else if (userAnswer.answer == TypeAnswerDice.p8 && totalRed == 4) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 14;
           if (user) user.points += points;
@@ -64,7 +64,7 @@ export class BullQueueConsumerServiceCalcPointDice {
       //1:14
     } else if (totalRed == 1 || totalRed == 3) {
       listUser.forEach((userAnswer) => {
-        if (userAnswer.answer == TypeAnswerDice.p2) {
+        if (userAnswer.answer == TypeAnswerDice.p2 && totalRed == 1) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 2.8;
           if (user) user.points += points;
@@ -75,7 +75,7 @@ export class BullQueueConsumerServiceCalcPointDice {
               points,
               type: TypeUpdatePointUser.up,
             });
-        } else if (userAnswer.answer == TypeAnswerDice.p9) {
+        } else if (userAnswer.answer == TypeAnswerDice.p9 && totalRed == 3) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 2.8;
           if (user) user.points += points;
