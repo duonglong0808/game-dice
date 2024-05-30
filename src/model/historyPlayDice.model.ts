@@ -5,7 +5,7 @@ import { StatusHistoryPlayDice } from 'src/constants';
 
 @Table({
   tableName: 'HistoryPlayDices',
-  timestamps: true,
+  timestamps: false,
   indexes: [
     { name: 'gameDiceId_index', fields: ['gameDiceId'] },
     { name: 'diceDetailId_index', fields: ['diceDetailId'] },
@@ -46,6 +46,9 @@ export class HistoryPlayDiceModel extends Model {
 
   @BelongsTo(() => DiceDetailModel)
   diceDetail: DiceDetailModel;
+
+  @Column({ type: DataType.DATE })
+  createdAt: Date;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isDeleted: boolean;

@@ -50,7 +50,7 @@ export class HistoryPlayService {
       this.cacheService.hset(keyCheckBetPosition, String(dto.answer), dto.point),
       // this.cacheService.sadd(`user-play-dice:${dto.transaction}`, keyCheckBetPosition),
     ]);
-    return this.historyPlayRepository.create({ ...dto, gamePointId });
+    return this.historyPlayRepository.create({ ...dto, gamePointId, createdAt: new Date() });
   }
 
   async checkBalanceAndDeductPoint(slug: string, userId: number, points: number): Promise<number> {
