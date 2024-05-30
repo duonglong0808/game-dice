@@ -26,9 +26,20 @@ export class BullQueueConsumerServiceCalcPointDice {
     const dataUserUpPoint: DataJobAddPointToUser[] = [];
     if (totalRed == 0 || totalRed == 4) {
       listUser.forEach((userAnswer) => {
-        if (userAnswer.answer == TypeAnswerDice.p1 || userAnswer.answer == TypeAnswerDice.p8) {
+        if (userAnswer.answer == TypeAnswerDice.p1) {
           const user = dataUserUpPoint.find((user) => user.userId);
-          const points = userAnswer.point + userAnswer.point * 14 + userAnswer.point * 6.5;
+          const points = userAnswer.point + userAnswer.point * 14;
+          if (user) user.points += points;
+          else
+            dataUserUpPoint.push({
+              gamePointId: userAnswer.gamePointId,
+              userId: userAnswer.userId,
+              points,
+              type: TypeUpdatePointUser.up,
+            });
+        } else if (userAnswer.answer == TypeAnswerDice.p8) {
+          const user = dataUserUpPoint.find((user) => user.userId);
+          const points = userAnswer.point + userAnswer.point * 14;
           if (user) user.points += points;
           else
             dataUserUpPoint.push({
@@ -53,7 +64,18 @@ export class BullQueueConsumerServiceCalcPointDice {
       //1:14
     } else if (totalRed == 1 || totalRed == 3) {
       listUser.forEach((userAnswer) => {
-        if (userAnswer.answer == TypeAnswerDice.p2 || userAnswer.answer == TypeAnswerDice.p9) {
+        if (userAnswer.answer == TypeAnswerDice.p2) {
+          const user = dataUserUpPoint.find((user) => user.userId);
+          const points = userAnswer.point + userAnswer.point * 2.8;
+          if (user) user.points += points;
+          else
+            dataUserUpPoint.push({
+              gamePointId: userAnswer.gamePointId,
+              userId: userAnswer.userId,
+              points,
+              type: TypeUpdatePointUser.up,
+            });
+        } else if (userAnswer.answer == TypeAnswerDice.p9) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 2.8;
           if (user) user.points += points;
