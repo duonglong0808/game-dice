@@ -69,11 +69,12 @@ export class HistoryPlayService {
     );
   }
 
-  findAllCms(pagination: Pagination, diceDetailId: number, gameDiceId: number, userId: number, sort?: string, typeSort?: string) {
+  findAllCms(pagination: Pagination, diceDetailId: number, gameDiceId: number, userId: number, dateId: number, sort?: string, typeSort?: string) {
     const filter: any = {};
     if (diceDetailId) filter.diceDetailId = diceDetailId;
     if (gameDiceId) filter.gameDiceId = gameDiceId;
     if (userId) filter.userId = userId;
+    if (dateId) filter.dateId = dateId;
 
     return this.historyPlayRepository.findAll(filter, {
       //
