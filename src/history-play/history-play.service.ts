@@ -7,6 +7,7 @@ import { StatusDiceDetail, TypeAnswerDice, messageResponse } from 'src/constants
 import { GamePointService } from 'src/game-point/game-point.service';
 import { UserPointService } from 'src/user-point/user-point.service';
 import { Pagination } from 'src/middlewares';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class HistoryPlayService {
@@ -69,12 +70,16 @@ export class HistoryPlayService {
     );
   }
 
-  findAllCms(pagination: Pagination, diceDetailId: number, gameDiceId: number, userId: number, dateId: number, sort?: string, typeSort?: string) {
+  findAllCms(pagination: Pagination, diceDetailId: number, gameDiceId: number, userId: number, dateFrom: Date, dateTo: Date, sort?: string, typeSort?: string) {
     const filter: any = {};
     if (diceDetailId) filter.diceDetailId = diceDetailId;
     if (gameDiceId) filter.gameDiceId = gameDiceId;
     if (userId) filter.userId = userId;
-    if (dateId) filter.dateId = dateId;
+    if (dateFrom && dateTo)
+      filter.dateId = {
+        [Op.gte]: dateFrom,
+        [Op.lte]: dateTo,
+      };
 
     return this.historyPlayRepository.findAll(filter, {
       //

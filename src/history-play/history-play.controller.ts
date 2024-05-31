@@ -37,8 +37,12 @@ export class HistoryPlayController {
     type: Number,
   })
   @ApiQuery({
-    name: 'dateId',
-    type: Number,
+    name: 'dateFrom',
+    type: Date,
+  })
+  @ApiQuery({
+    name: 'dateTo',
+    type: Date,
   })
   @ApiQuery({
     name: 'sort',
@@ -48,8 +52,8 @@ export class HistoryPlayController {
     name: 'typeSort',
     type: String,
   })
-  findAll(@Req() req: any, @Query('userId') userId: number, @Query('gameDiceId') gameDiceId: number, @Query('dateId') dateId: number, @Query('diceDetailId') diceDetailId: number, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
-    return this.historyPlayService.findAllCms(req['pagination'], diceDetailId, gameDiceId, userId, dateId, sort, typeSort);
+  findAll(@Req() req: any, @Query('userId') userId: number, @Query('gameDiceId') gameDiceId: number, @Query('dateForm') dateForm: Date, @Query('dateTo') dateTo: Date, @Query('diceDetailId') diceDetailId: number, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
+    return this.historyPlayService.findAllCms(req['pagination'], diceDetailId, gameDiceId, userId, dateForm, dateTo, sort, typeSort);
   }
 
   @Patch(':id')
