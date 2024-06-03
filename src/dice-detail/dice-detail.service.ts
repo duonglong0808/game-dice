@@ -15,7 +15,7 @@ import { Op } from 'sequelize';
 export class DiceDetailService {
   constructor(
     @Inject('DiceDetailRepositoryInterface')
-    private readonly gameDiceRepository: DiceDetailRepositoryInterface,
+    private readonly diceDetailRepository: DiceDetailRepositoryInterface,
     private readonly diceService: DiceService,
     private readonly cacheService: RedisService,
     private readonly bullQueueService: BullQueueService,
@@ -29,18 +29,18 @@ export class DiceDetailService {
     }
     const dice = await this.diceService.checkExitByCondition({ id: dto.gameDiceId });
     if (dice == 0) throw new Error(messageResponse.system.dataInvalid);
-    const totalTransaction = dto.transaction ? dto.transaction : await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
-    return this.gameDiceRepository.create({ ...dto, status: StatusDiceDetail.prepare, transaction: totalTransaction + 1 });
+    const totalTransaction = dto.transaction ? dto.transaction : await this.diceDetailRepository.count({ gameDiceId: dto.gameDiceId });
+    return this.diceDetailRepository.create({ ...dto, status: StatusDiceDetail.prepare, transaction: totalTransaction + 1 });
   }
 
   findAllCMS(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
     const filter: any = {};
     if (gameDiceId) filter.gameDiceId = gameDiceId;
-    return this.gameDiceRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt'] });
+    return this.diceDetailRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt'] });
   }
 
   async findHistoryNear() {
-    const { data: dataHistory } = await this.gameDiceRepository.findAll(
+    const { data: dataHistory } = await this.diceDetailRepository.findAll(
       {
         status: StatusDiceDetail.end,
         totalRed: { [Op.ne]: null },
@@ -52,7 +52,7 @@ export class DiceDetailService {
         typeSort: 'DESC',
       },
     );
-    // const { data: transactionNow } = await this.gameDiceRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
+    // const { data: transactionNow } = await this.diceDetailRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
     return {
       dataHistory,
       // transactionNow,
@@ -60,7 +60,7 @@ export class DiceDetailService {
   }
 
   findOne(id: number) {
-    return this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt']);
+    return this.diceDetailRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt']);
   }
 
   getTimeDelayQueueUpdateStatus(status: number) {
@@ -88,14 +88,14 @@ export class DiceDetailService {
       if (!diceDetail) throw Error(messageResponse.system.idInvalid);
       if (diceDetail.status >= StatusDiceDetail.check) throw Error(messageResponse.diceDetail.transactionIsRunning);
     }
-    const update = await this.gameDiceRepository.findByIdAndUpdate(id, dto);
+    const update = await this.diceDetailRepository.findByIdAndUpdate(id, dto);
     if (!update) throw Error(messageResponse.system.badRequest);
     return update;
   }
 
   async updateStatusAndAnswersBOT(dto: UpdateStatusDiceDetailBotDto) {
     const dateId = +formatDateToId();
-    const diceDetail = await this.gameDiceRepository.findOneByCondition({
+    const diceDetail = await this.diceDetailRepository.findOneByCondition({
       gameDiceId: dto.gameDiceId,
       mainTransaction: dto.mainTransaction,
       dateId,
@@ -105,7 +105,7 @@ export class DiceDetailService {
       return this.updateStatus(diceDetail.id, { totalRed: dto.totalRed });
     } else {
       // console.log('tạo mới', dto);
-      const totalTransaction = await this.gameDiceRepository.count({ gameDiceId: dto.gameDiceId });
+      const totalTransaction = await this.diceDetailRepository.count({ gameDiceId: dto.gameDiceId });
       const createDto = {
         dateId,
         gameDiceId: dto.gameDiceId,
@@ -114,13 +114,13 @@ export class DiceDetailService {
         status: dto.totalRed ? StatusDiceDetail.waitOpen : StatusDiceDetail.shake,
         transaction: totalTransaction + 1,
       };
-      const newDice = await this.gameDiceRepository.create(createDto);
+      const newDice = await this.diceDetailRepository.create(createDto);
       return this.updateStatus(newDice.id);
     }
   }
 
   async updateStatus(id: number, dto?: UpdateStatusDiceDetailDto) {
-    const diceDetail = await this.gameDiceRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'gameDiceId', 'totalRed', 'status']);
+    const diceDetail = await this.diceDetailRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'gameDiceId', 'totalRed', 'status']);
     if (!diceDetail) throw new Error(messageResponse.system.idInvalid);
     const key = `${process.env.APP_NAME}:dice-detail:${diceDetail.gameDiceId}:${diceDetail.id}:${diceDetail.transaction}`;
     const date = new Date().getTime();
@@ -183,10 +183,14 @@ export class DiceDetailService {
     return diceDetail;
   }
 
+  async updateDataBetAndReward(id: number, totalBet: number, totalReward: number) {
+    return this.diceDetailRepository.findByIdAndUpdate(id, { totalBet, totalReward });
+  }
+
   async remove(id: number) {
-    const diceById = await this.gameDiceRepository.findOneById(id);
+    const diceById = await this.diceDetailRepository.findOneById(id);
     if (diceById && diceById.status !== StatusDiceDetail.prepare) throw Error(messageResponse.diceDetail.transactionIsRunning);
-    const softDelete = await this.gameDiceRepository.softDelete(id);
+    const softDelete = await this.diceDetailRepository.softDelete(id);
     if (!softDelete) throw Error(messageResponse.system.badRequest);
     return softDelete;
   }

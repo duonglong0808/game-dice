@@ -39,6 +39,12 @@ export class DiceDetailModel extends Model {
   @Column({ type: DataType.INTEGER })
   dateId: number;
 
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  totalBet: number;
+
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  totalReward: number;
+
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isDeleted: boolean;
 

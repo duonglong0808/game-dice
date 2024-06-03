@@ -15,6 +15,7 @@ export class BullQueueConsumerServiceCalcPointDice {
     private readonly bullQueueService: BullQueueService,
     private readonly historyPlayService: HistoryPlayService,
     private readonly sendMessageWsService: SendMessageWsService,
+    private readonly diceDetailService: DiceDetailService,
   ) {}
 
   @Process()
@@ -188,6 +189,13 @@ export class BullQueueConsumerServiceCalcPointDice {
             });
         }
       });
+    }
+
+    // calc total bet
+    if (listUser.length) {
+      const totalBet = listUser.reduce((pre, item) => pre + item.point, 0);
+      const totalReward = dataUserUpPoint.reduce((pre, item) => pre + item.points, 0) || 0;
+      this.diceDetailService.updateDataBetAndReward(data.diceDetailId, totalBet, totalReward);
     }
     this.historyPlayService.updateStatusByDiceDetailId(data.diceDetailId, 1);
     return this.updatePointUserAndSendWs(dataUserUpPoint);
