@@ -13,15 +13,12 @@ import { SequelizeModule } from '@nestjs/sequelize';
 // import { User } from './model';
 import { Dialect } from 'sequelize';
 import { Environment } from './constants';
-import { SendMailService } from './send-mail/send-mail.service';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { join } from 'path';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { GameDiceModule } from './dice/dice.module';
 import { DiceDetailModule } from './dice-detail/dice-detail.module';
 import { HistoryPlayModule } from './history-play/history-play.module';
 import { BullQueueModule } from './bull-queue/bull-queue.module';
 import { HttpModule } from '@nestjs/axios';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 console.log(__dirname);
 @Module({
@@ -58,7 +55,16 @@ console.log(__dirname);
         console.log(log); // Để theo dõi log kết nối trong quá trình phát triển
       },
     }),
-    // SequelizeModule.forFeature([User]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.get('THROTTLE_TTL'),
+          limit: config.get('THROTTLE_LIMIT'),
+        },
+      ],
+    }),
     // FireBase
     FirebaseModule.forRoot({
       googleApplicationCredential: {
@@ -81,6 +87,10 @@ console.log(__dirname);
     FirebaseService,
     RedisService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {
