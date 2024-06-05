@@ -18,8 +18,9 @@ export class DiceDetailRepository extends BaseRepositoryAbstract<DiceDetailModel
         [DiceDetailModel.sequelize.fn('sum', DiceDetailModel.sequelize.col('totalReward')), 'totalRewardSum'],
       ],
       where: {
-        createdAt: {
-          [Op.between]: [new Date(dateFrom), new Date(dateTo)],
+        dateId: {
+          [Op.gte]: dateFrom,
+          [Op.lte]: dateTo,
         },
         isDeleted: false, // Đảm bảo chỉ lấy các bản ghi không bị xóa
       },
