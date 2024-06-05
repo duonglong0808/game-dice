@@ -38,6 +38,27 @@ export class DiceDetailController {
     }
   }
 
+  @Get('admin/brief')
+  @BaseFilter()
+  @ApiQuery({
+    name: 'dateFrom',
+    description: 'thời gian bắt đầu',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'dateTo',
+    description: 'thời gian kết thúc',
+    type: Number,
+  })
+  @ApiOperationCustom('Dice Detail brief', 'get')
+  findTotalBetAndRewardByCMS(@Query('dateFrom') dateFrom: number, @Query('dateTo') dateTo: number) {
+    try {
+      return this.diceDetailService.getBrief(dateFrom, dateTo);
+    } catch (error) {
+      throw new HttpException(error?.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Get('')
   @ApiQuery({
     name: 'gameDiceId',

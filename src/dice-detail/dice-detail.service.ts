@@ -36,7 +36,7 @@ export class DiceDetailService {
   findAllCMS(gameDiceId: number, pagination: Pagination, sort?: string, typeSort?: string) {
     const filter: any = {};
     if (gameDiceId) filter.gameDiceId = gameDiceId;
-    return this.diceDetailRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt'] });
+    return this.diceDetailRepository.findAll(filter, { sort, typeSort, ...pagination, projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'createdAt', 'totalBet', 'totalReward'] });
   }
 
   async findHistoryNear() {
@@ -50,6 +50,7 @@ export class DiceDetailService {
         limit: 240,
         sort: 'id',
         typeSort: 'DESC',
+        projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId'],
       },
     );
     // const { data: transactionNow } = await this.diceDetailRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
@@ -57,6 +58,10 @@ export class DiceDetailService {
       dataHistory,
       // transactionNow,
     };
+  }
+
+  async getBrief(dateFrom: number, dateTo: number) {
+    return this.diceDetailRepository.getTotalBetAndReward(dateFrom, dateTo);
   }
 
   findOne(id: number) {
@@ -146,7 +151,6 @@ export class DiceDetailService {
       case StatusDiceDetail.waitOpen:
         await this.cacheService.set(key, StatusDiceDetail.check, 20);
         diceDetail.status = StatusDiceDetail.check;
-        console.log('🛫🛫🛫 ~ file: dice-detail.service.ts:126 ~ updateStatus ~ dto:', dto);
         if (dto?.totalRed >= 0) diceDetail.totalRed = dto.totalRed;
         this.bullQueueService.addToQueueCalcPointDice({ diceDetailId: diceDetail.id, totalRed: diceDetail.totalRed, transactionId: diceDetail.transaction });
         break;
