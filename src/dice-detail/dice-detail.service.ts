@@ -50,7 +50,7 @@ export class DiceDetailService {
         limit: 240,
         sort: 'id',
         typeSort: 'DESC',
-        projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId'],
+        projection: ['id', 'transaction', 'mainTransaction', 'totalRed', 'status', 'dateId', 'gameDiceId', 'id'],
       },
     );
     // const { data: transactionNow } = await this.diceDetailRepository.findAll({ gameDiceId }, { limit: 1, sort: 'transaction', typeSort: 'DESC' });
