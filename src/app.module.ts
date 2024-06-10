@@ -2,23 +2,24 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FirebaseModule } from 'nestjs-firebase';
 import { FirebaseService } from './utils/firebase-service';
-import { UserModule } from './user/user.module';
-import { RedisService } from './cache/redis.service';
-import { PaginationMiddleware } from './middlewares';
-import { AuthModule } from './auth/auth.module';
+
+import { UserModule } from './modules/user/user.module';
+import { RedisService } from './modules/cache/redis.service';
+import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/guards';
-import { UploadModule } from './upload/upload.module';
+import { JwtAuthGuard } from './modules/auth/guards';
+import { UploadModule } from './modules/upload/upload.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-// import { User } from './model';
+// import { User } from './modules/model';
 import { Dialect } from 'sequelize';
 import { Environment } from './constants';
-import { GameDiceModule } from './dice/dice.module';
-import { DiceDetailModule } from './dice-detail/dice-detail.module';
-import { HistoryPlayModule } from './history-play/history-play.module';
-import { BullQueueModule } from './bull-queue/bull-queue.module';
+import { GameDiceModule } from './modules/dice/dice.module';
+import { DiceDetailModule } from './modules/dice-detail/dice-detail.module';
+import { HistoryPlayModule } from './modules/history-play/history-play.module';
+import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
 import { HttpModule } from '@nestjs/axios';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { PaginationMiddleware } from './middlewares';
 
 console.log(__dirname);
 @Module({
