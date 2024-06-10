@@ -20,6 +20,7 @@ import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
 import { HttpModule } from '@nestjs/axios';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PaginationMiddleware } from './middlewares';
+import { BaccaratModule } from './modules/baccarat/baccarat.module';
 
 console.log(__dirname);
 @Module({
@@ -82,6 +83,7 @@ console.log(__dirname);
     DiceDetailModule,
     HistoryPlayModule,
     BullQueueModule,
+    BaccaratModule,
   ],
   providers: [
     //

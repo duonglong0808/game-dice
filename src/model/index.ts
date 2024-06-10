@@ -6,6 +6,7 @@ export * from './diceDetail.model';
 export * from './historyPlayDice.model';
 export * from './game-point.model';
 export * from './user-point.model';
+export * from './gameBaccarat.model';
 
 export const addConditionNotDelete = (options: any) => {
   if (!options.where) {

@@ -30,6 +30,11 @@ export const TypeGameDice = {
   Blockchain: '2',
 };
 
+export const TypeGameBaccarat = {
+  normal: '0',
+  flash: '1',
+};
+
 export const StatusDiceDetail = {
   prepare: 0,
   shake: 1,
