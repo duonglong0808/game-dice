@@ -21,7 +21,7 @@ export class BaccaratService {
   }
 
   findAll(pagination: Pagination, sort?: string, typeSort?: string) {
-    return this.gameBaccaratRepository.findAll({}, { sort, typeSort, ...pagination, projection: ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive', 'idLive', 'idLiveMobile'] });
+    return this.gameBaccaratRepository.findAll({}, { sort, typeSort, ...pagination, projection: ['id', 'name', 'type', 'nameAuthor', 'avtAuthor', 'nationalAuthor', 'idLive', 'idLiveMobile'] });
   }
 
   findOne(id: number) {

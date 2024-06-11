@@ -19,8 +19,13 @@ export class BaccaratController {
   @Get()
   @BaseFilter()
   @ApiOperationCustom('Dice', 'get')
-  findAll(@Req() req: any, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
-    return this.baccaratService.findAll(req['pagination'], sort, typeSort);
+  async findAll(@Req() req: any, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
+    try {
+      const data = await this.baccaratService.findAll(req['pagination'], sort, typeSort);
+      return data;
+    } catch (error) {
+      console.log('🚀 ~ BaccaratController ~ findAll ~ error:', error);
+    }
   }
 
   @Get(':id')
