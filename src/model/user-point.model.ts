@@ -1,4 +1,4 @@
-import { BeforeCount, BeforeFind, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BeforeCount, BeforeFind, BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import { DataType } from 'sequelize-typescript';
 import { GamePointModel, UserModel, addConditionNotDelete } from '.';
 
@@ -14,9 +14,15 @@ export class UserPointModel extends Model {
   @Column
   userId: number;
 
+  @BelongsTo(() => UserModel)
+  user: UserModel;
+
   @ForeignKey(() => GamePointModel) // Khóa ngoại đến bảng điểm game
   @Column
   gamePointId: number;
+
+  @BelongsTo(() => GamePointModel)
+  gamePoint: GamePointModel;
 
   @Column({ type: DataType.INTEGER })
   points: number;
