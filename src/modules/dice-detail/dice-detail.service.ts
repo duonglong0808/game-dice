@@ -44,7 +44,6 @@ export class DiceDetailService {
       {
         status: StatusDiceDetail.end,
         totalRed: { [Op.ne]: null },
-        mainTransaction: { [Op.ne]: null },
       },
       {
         limit: 240,

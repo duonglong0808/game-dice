@@ -44,6 +44,15 @@ export const StatusDiceDetail = {
   end: 5,
 };
 
+export const StatusBaccarat = {
+  prepare: 0,
+  bet: 1,
+  waitOpen: 2,
+  showPoker: 3,
+  check: 4,
+  end: 5,
+};
+
 export const TypeAnswerDice = {
   p1: 1,
   p2: 2,
@@ -65,6 +74,22 @@ export const StatusHistoryPlayDice = {
 export const TypeUpdatePointUser = {
   up: 0,
   down: 1,
+};
+
+export const pointPoker = {
+  A: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 0,
+  J: 0,
+  Q: 0,
+  K: 10,
 };
 
 export * from './message';

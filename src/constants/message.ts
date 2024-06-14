@@ -17,6 +17,10 @@ export const messageResponse = {
     transactionIsRunning: 'transaction_dice_is_running',
     transactionIsFinished: 'transaction_dice_is_finished',
   },
+  baccaratDetail: {
+    transactionIsRunning: 'transaction_baccarat_is_running',
+    transactionIsFinished: 'transaction_baccarat_is_finished',
+  },
   historyPlay: {
     transactionIsFinished: 'transaction_is_finished',
     positionHasChoice: 'position_has_choice',
