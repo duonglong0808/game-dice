@@ -2,7 +2,7 @@ import { BullModule } from '@nestjs/bull';
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
-import { BullQueueConsumerServiceAddPointToUser, BullQueueConsumerServiceCalcPointDice, BullQueueConsumerServiceUpdateStatusDice } from './bullqueueConsumer.service';
+import { BullQueueConsumerServiceAddPointToUser, BullQueueConsumerServiceCalcPointDice, BullQueueConsumerServiceUpdateStatusBaccarat, BullQueueConsumerServiceUpdateStatusDice } from './bullqueueConsumer.service';
 import { BullQueueService } from './bullqueue.service';
 import { HistoryPlayModule } from '../history-play/history-play.module';
 import { HistoryPlayService } from '../history-play/history-play.service';
@@ -14,6 +14,10 @@ import { SendMessageWsService } from '../send-message-ws/send-message-ws.service
 import { HttpModule } from '@nestjs/axios';
 import { DiceDetailModule } from '../dice-detail/dice-detail.module';
 import { DiceDetailService } from '../dice-detail/dice-detail.service';
+import { BaccaratDetailService } from '../baccarat-detail/baccarat-detail.service';
+import { GameDiceModule } from '../dice/dice.module';
+import { BaccaratDetailModule } from '../baccarat-detail/baccarat-detail.module';
+import { BaccaratModule } from '../baccarat/baccarat.module';
 
 @Module({
   imports: [
@@ -55,23 +59,31 @@ import { DiceDetailService } from '../dice-detail/dice-detail.service';
       {
         name: 'auto-update-status-dice',
       },
+      {
+        name: 'auto-update-status-baccarat',
+      },
     ),
     HistoryPlayModule,
     UserPointModule,
     GamePointModule,
+    GameDiceModule,
+    BaccaratModule,
     forwardRef(() => DiceDetailModule),
+    forwardRef(() => BaccaratDetailModule),
   ],
   providers: [
     //
     BullQueueConsumerServiceCalcPointDice,
     BullQueueConsumerServiceAddPointToUser,
     BullQueueConsumerServiceUpdateStatusDice,
+    BullQueueConsumerServiceUpdateStatusBaccarat,
     BullQueueService,
     HistoryPlayService,
     UserPointService,
     RedisService,
     SendMessageWsService,
     DiceDetailService,
+    BaccaratDetailService,
   ],
   exports: [BullQueueService],
 })

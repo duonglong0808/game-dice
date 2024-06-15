@@ -1,7 +1,7 @@
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
-import { DataJobAddPointToUser, DataJobAutoUpdateStatusDice, DataJobCalcPointDice } from './dto/interface';
+import { DataJobAddPointToUser, DataJobAutoUpdateStatusBaccarat, DataJobAutoUpdateStatusDice, DataJobCalcPointDice } from './dto/interface';
 
 @Injectable()
 export class BullQueueService {
@@ -10,6 +10,7 @@ export class BullQueueService {
     @InjectQueue('calc-point-dice') private readonly calcPointDiceQueue: Queue,
     @InjectQueue('add-point-to-user') private readonly addPointToUserQueue: Queue,
     @InjectQueue('auto-update-status-dice') private readonly updateStatusDiceQueue: Queue,
+    @InjectQueue('auto-update-status-baccarat') private readonly updateStatusBaccaratQueue: Queue,
   ) {}
 
   async addToQueueCalcPointDice(data: DataJobCalcPointDice): Promise<any> {
@@ -24,5 +25,10 @@ export class BullQueueService {
   async addToQueueAutoUpdateStatusDice(data: DataJobAutoUpdateStatusDice, delay: number): Promise<any> {
     console.log('THêm addToQueueAutoUpdateStatusDice', new Date().getTime(), delay, new Date().getTime() + delay * 1000);
     return this.updateStatusDiceQueue.add(data, { delay: delay * 1000 });
+  }
+
+  async addToQueueAutoUpdateStatusBaccarat(data: DataJobAutoUpdateStatusBaccarat, delay: number): Promise<any> {
+    console.log('THêm addToQueueAutoUpdateStatusBaccarat', new Date().getTime(), delay, new Date().getTime() + delay * 1000);
+    return this.updateStatusBaccaratQueue.add(data, { delay: delay * 1000 });
   }
 }

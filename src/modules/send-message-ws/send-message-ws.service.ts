@@ -20,6 +20,22 @@ export class SendMessageWsService {
     }
   }
 
+  updateStatusBaccarat(gameBaccaratId: number, baccaratDetailId: number, transaction: number, mainTransaction: string, status: number | string, pokerPlayer: string, pokerBanker: string) {
+    try {
+      return this.httpService.axiosRef.post(`${process.env.API_WSK}/baccarat/status`, {
+        gameBaccaratId,
+        baccaratDetailId,
+        transaction,
+        mainTransaction,
+        status,
+        pokerBanker,
+        pokerPlayer,
+      });
+    } catch (error) {
+      console.log('🛫🛫🛫 ~ file: send-message-ws.service.ts:14 ~ updateStatusDice ~ error:', error);
+    }
+  }
+
   upPointByUser(data: { userId: number; points: number; type: number }[]) {
     console.log('🚀 ~ SendMessageWsService ~ upPointByUser ~ data:', data);
     try {

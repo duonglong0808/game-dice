@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBaccaratDetailDto {
-  @ApiProperty({ name: 'mainTransaction', type: Number, description: 'phiên ở trang chính' })
-  mainTransaction: number;
+  @ApiProperty({ name: 'mainTransaction', type: String, description: 'phiên ở trang chính' })
+  mainTransaction: string;
 
   @ApiProperty({ name: 'transaction', type: Number, description: 'phiên ở trang chính' })
   transaction?: number;

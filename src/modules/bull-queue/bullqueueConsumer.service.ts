@@ -6,8 +6,9 @@ import { HistoryPlayService } from '../history-play/history-play.service';
 import { BullQueueService } from './bullqueue.service';
 import { UserPointService } from '../user-point/user-point.service';
 import { SendMessageWsService } from '../send-message-ws/send-message-ws.service';
-import { DataJobAddPointToUser, DataJobCalcPointDice, DataJobAutoUpdateStatusDice } from './dto/interface';
+import { DataJobAddPointToUser, DataJobCalcPointDice, DataJobAutoUpdateStatusDice, DataJobAutoUpdateStatusBaccarat } from './dto/interface';
 import { DiceDetailService } from '../dice-detail/dice-detail.service';
+import { BaccaratDetailService } from '../baccarat-detail/baccarat-detail.service';
 
 @Processor('calc-point-dice')
 export class BullQueueConsumerServiceCalcPointDice {
@@ -242,5 +243,17 @@ export class BullQueueConsumerServiceUpdateStatusDice {
     const { data } = job;
     console.log('🛫🛫🛫 ~ file: bullqueueConsumer.service.ts:211 ~ updateStatusDice ~ data:', data, new Date().getTime());
     return this.diceDetailService.updateStatus(data.diceDetailId);
+  }
+}
+
+@Processor('auto-update-status-baccarat')
+export class BullQueueConsumerServiceUpdateStatusBaccarat {
+  constructor(private readonly baccaratDetailService: BaccaratDetailService) {}
+
+  @Process()
+  async updateStatusDice(job: Job<DataJobAutoUpdateStatusBaccarat>) {
+    const { data } = job;
+    console.log('🛫🛫🛫 ~ file: bullqueueConsumer.service.ts:211 ~ updateStatusDice ~ data:', data, new Date().getTime());
+    return this.baccaratDetailService.updateStatus(data.baccaratDetailId);
   }
 }

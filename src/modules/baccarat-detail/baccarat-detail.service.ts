@@ -83,10 +83,27 @@ export class BaccaratDetailService {
     }
   }
 
+  getTimeDelayQueueUpdateStatus(status: number) {
+    switch (status) {
+      case StatusBaccarat.prepare:
+        return false;
+      case StatusBaccarat.bet:
+        return 14;
+      case StatusBaccarat.waitOpen:
+        return 2;
+      case StatusBaccarat.check:
+        return 5;
+      case StatusBaccarat.end:
+        return 1;
+      default:
+        return false;
+    }
+  }
+
   async updateStatus(id: number, dto?: UpdateStatusBaccaratDetailDto) {
-    const baccaratDetail = await this.baccaratDetailRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'gameDiceId', 'totalRed', 'status']);
+    const baccaratDetail = await this.baccaratDetailRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'gameBaccaratId', 'status', 'pokerPlayer', 'pokerBanker']);
     if (!baccaratDetail) throw new Error(messageResponse.system.idInvalid);
-    const key = `${process.env.APP_NAME}:dice-detail:${baccaratDetail.gameBaccaratId}:${baccaratDetail.id}:${baccaratDetail.transaction}`;
+    const key = `${process.env.APP_NAME}:baccarat-detail:${baccaratDetail.gameBaccaratId}:${baccaratDetail.id}:${baccaratDetail.transaction}`;
     const date = new Date().getTime();
     const countDown = 14 * 1000;
     switch (baccaratDetail.status) {
@@ -106,14 +123,24 @@ export class BaccaratDetailService {
         break;
       case StatusBaccarat.showPoker:
         baccaratDetail.status = StatusBaccarat.showPoker;
-        const totalPointPlayer = dto.pokerPlayer.reduce((pre, player) => (pre += pointPoker[player.split('-')[0]]), 0) % 10;
-        const totalPointBanker = dto.pokerBanker.reduce((pre, player) => (pre += pointPoker[player.split('-')[0]]), 0) % 10;
-        if ((dto.pokerPlayer.length == 3 && dto.pokerBanker.length == 3) || totalPointPlayer >= 9 || totalPointBanker >= 9) {
+        const totalPointPlayer = dto.pokerPlayer.reduce((pre, player) => (pre += pointPoker[player.split('_')[1].slice(1)]), 0) % 10;
+        const totalPointBanker = dto.pokerBanker.reduce((pre, player) => (pre += pointPoker[player.split('_')[1].slice(1)]), 0) % 10;
+
+        // Kiểm tra điều kiện rút bài của Player
+        const playerNeedsCard = dto.pokerPlayer.length == 2 && totalPointPlayer <= 5;
+
+        // Kiểm tra điều kiện rút bài của Banker
+        const bankerNeedsCard = dto.pokerBanker.length == 2 && (totalPointBanker <= 2 || (totalPointBanker == 3 && totalPointPlayer !== 8) || (totalPointBanker == 4 && [2, 3, 4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 5 && [4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 6 && [6, 7].includes(totalPointPlayer)));
+
+        if ((dto.pokerPlayer.length == 3 && dto.pokerBanker.length == 3) || totalPointPlayer >= 9 || totalPointBanker >= 9 || (!playerNeedsCard && !bankerNeedsCard)) {
           baccaratDetail.status = StatusBaccarat.check;
+          baccaratDetail.pointBanker = totalPointBanker;
+          baccaratDetail.pointPlayer = totalPointPlayer;
+
+          await this.cacheService.set(key, StatusBaccarat.showPoker, 20);
         }
-
-        await this.cacheService.set(key, StatusBaccarat.showPoker, 20);
-
+        baccaratDetail.pokerPlayer = JSON.stringify(dto.pokerPlayer);
+        baccaratDetail.pokerBanker = JSON.stringify(dto.pokerBanker);
         break;
       case StatusBaccarat.check:
         await this.cacheService.delete(key);
@@ -124,26 +151,33 @@ export class BaccaratDetailService {
         throw new Error(messageResponse.baccaratDetail.transactionIsFinished);
         break;
     }
-    // await this.sendMessageWsService.updateStatusDice(baccaratDetail.gameDiceId, baccaratDetail.id, baccaratDetail.transaction, baccaratDetail.mainTransaction, baccaratDetail.status == StatusBaccaratDetail.bet ? `${StatusBaccaratDetail.bet}:${date + countDown}` : baccaratDetail.status, baccaratDetail.status >= StatusBaccaratDetail.check && baccaratDetail.totalRed);
+    // await this.sendMessageWsService.updateStatusBaccarat(
+    //   //
+    //   baccaratDetail.gameBaccaratId,
+    //   baccaratDetail.id,
+    //   baccaratDetail.transaction,
+    //   baccaratDetail.mainTransaction,
+    //   baccaratDetail.status == StatusBaccarat.bet ? `${StatusBaccarat.bet}:${date + countDown}` : baccaratDetail.status,
+    //   JSON.stringify(dto.pokerPlayer),
+    //   JSON.stringify(dto.pokerBanker),
+    // );
     await baccaratDetail.save();
 
     // Auto update and create new dice transaction
-    // const timeDelay = this.getTimeDelayQueueUpdateStatus(baccaratDetail.status);
-    // if (timeDelay) {
-    //   if (baccaratDetail.status == StatusBaccaratDetail.end) {
-    //     const createDto: CreateGamebaccaratDetailDto = {
-    //       dateId: +formatDateToId(),
-    //       gameDiceId: baccaratDetail.gameDiceId,
-    //       mainTransaction: baccaratDetail.mainTransaction + 1,
-    //       transaction: baccaratDetail.transaction,
-    //       totalRed: null,
-    //     };
-    //     const newBaccaratDetail = await this.create(createDto);
-    //     // this.bullQueueService.addToQueueAutoUpdateStatusDice({ baccaratDetailId: newbaccaratDetail.id }, 5);
-    //   } else {
-    //     // this.bullQueueService.addToQueueAutoUpdateStatusDice({ baccaratDetailId: baccaratDetail.id }, timeDelay);
-    //   }
-    // }
+    const timeDelay = this.getTimeDelayQueueUpdateStatus(baccaratDetail.status);
+    if (timeDelay) {
+      if (baccaratDetail.status == StatusBaccarat.end) {
+        const createDto: CreateBaccaratDetailDto = {
+          dateId: +formatDateToId(),
+          gameBaccaratId: baccaratDetail.gameBaccaratId,
+          mainTransaction: `${baccaratDetail.mainTransaction.split('-')[0]}-${+baccaratDetail.mainTransaction.split('-')[1] + 1}`,
+          transaction: baccaratDetail.transaction,
+        };
+        const newBaccaratDetail = await this.create(createDto);
+      } else {
+        this.bullQueueService.addToQueueAutoUpdateStatusBaccarat({ baccaratDetailId: baccaratDetail.id }, timeDelay);
+      }
+    }
 
     return baccaratDetail;
   }

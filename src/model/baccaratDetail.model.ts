@@ -23,9 +23,6 @@ export class BaccaratDetailsModel extends Model {
   @Column({ type: DataType.STRING })
   mainTransaction: string;
 
-  @Column({ type: DataType.INTEGER })
-  totalRed: number;
-
   @Column({ type: DataType.INTEGER, defaultValue: StatusBaccarat.prepare })
   status?: number;
 

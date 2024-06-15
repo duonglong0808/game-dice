@@ -15,5 +15,12 @@ import { GameBaccaratRepository } from './repository/baccarat.repository';
       useClass: GameBaccaratRepository,
     },
   ],
+  exports: [
+    BaccaratService,
+    {
+      provide: 'GameBaccaratRepositoryInterface',
+      useClass: GameBaccaratRepository,
+    },
+  ],
 })
 export class BaccaratModule {}

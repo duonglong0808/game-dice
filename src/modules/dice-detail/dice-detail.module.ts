@@ -7,12 +7,17 @@ import { DiceDetailRepository } from './repository/dice-detail.repository';
 import { GameDiceModule } from '../dice/dice.module';
 import { DiceService } from '../dice/dice.service';
 import { RedisService } from '../cache/redis.service';
-import { BullQueueModule } from '../bull-queue/bull-queue.module';
+// import { BullQueueAddQueueModule } from '../bull-queue/bull-queue.module';
 import { HttpModule } from '@nestjs/axios';
 import { SendMessageWsService } from '../send-message-ws/send-message-ws.service';
 
 @Module({
-  imports: [SequelizeModule.forFeature([DiceDetailModel]), GameDiceModule, BullQueueModule, HttpModule],
+  imports: [
+    //
+    SequelizeModule.forFeature([DiceDetailModel]),
+    GameDiceModule,
+    HttpModule,
+  ],
   controllers: [DiceDetailController],
   providers: [
     DiceDetailService,
@@ -29,7 +34,6 @@ import { SendMessageWsService } from '../send-message-ws/send-message-ws.service
       provide: 'DiceDetailRepositoryInterface',
       useClass: DiceDetailRepository,
     },
-    DiceService,
   ],
 })
 export class DiceDetailModule {}

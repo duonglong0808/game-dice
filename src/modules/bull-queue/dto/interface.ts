@@ -14,3 +14,7 @@ export interface DataJobAddPointToUser {
 export interface DataJobAutoUpdateStatusDice {
   diceDetailId: number;
 }
+
+export interface DataJobAutoUpdateStatusBaccarat {
+  baccaratDetailId: number;
+}

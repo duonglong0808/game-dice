@@ -20,6 +20,7 @@ import { GameDiceRepository } from './repository/dice.repository';
       provide: 'GameDiceRepositoryInterface',
       useClass: GameDiceRepository,
     },
+    DiceService,
   ],
 })
 export class GameDiceModule {}

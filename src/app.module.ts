@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FirebaseModule } from 'nestjs-firebase';
 import { FirebaseService } from './utils/firebase-service';
@@ -10,17 +10,17 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guards';
 import { UploadModule } from './modules/upload/upload.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-// import { User } from './modules/model';
 import { Dialect } from 'sequelize';
 import { Environment } from './constants';
 import { GameDiceModule } from './modules/dice/dice.module';
 import { DiceDetailModule } from './modules/dice-detail/dice-detail.module';
 import { HistoryPlayModule } from './modules/history-play/history-play.module';
-import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
 import { HttpModule } from '@nestjs/axios';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PaginationMiddleware } from './middlewares';
 import { BaccaratModule } from './modules/baccarat/baccarat.module';
+import { BaccaratDetailModule } from './modules/baccarat-detail/baccarat-detail.module';
+import { BullQueueModule } from './modules/bull-queue/bull-queue.module';
 
 console.log(__dirname);
 @Module({
@@ -82,8 +82,10 @@ console.log(__dirname);
     GameDiceModule,
     DiceDetailModule,
     HistoryPlayModule,
-    BullQueueModule,
     BaccaratModule,
+    BullQueueModule,
+    // BullQueueAddQueueModule,
+    BaccaratDetailModule,
   ],
   providers: [
     //
