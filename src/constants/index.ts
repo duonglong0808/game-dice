@@ -66,7 +66,18 @@ export const TypeAnswerDice = {
   p10: 10,
 };
 
-export const StatusHistoryPlayDice = {
+export const TypeAnswerBaccarat = {
+  p1: 1, //Con đôi
+  p2: 2, // Con long bao
+  p3: 3, // Hoa
+  p4: 4, // Cai
+  p5: 5, // Con
+  p6: 6, // Super 6
+  p7: 7, // Cai doi
+  p8: 8, // Cai long bao
+};
+
+export const StatusHistoryPlayGame = {
   wait: 0,
   success: 1,
 };

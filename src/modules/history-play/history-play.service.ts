@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateHistoryPlayDto } from './dto/create-history-play.dto';
 import { UpdateHistoryPlayDto } from './dto/update-history-play.dto';
-import { HistoryPlayRepositoryInterface } from './interface/history-play.interface';
+import { HistoryPlayDiceRepositoryInterface } from './interface/history-play-dice.interface';
 import { RedisService } from '../cache/redis.service';
 import { StatusDiceDetail, TypeAnswerDice, messageResponse } from 'src/constants';
 import { Pagination } from 'src/middlewares';
@@ -12,8 +12,8 @@ import { GamePointService } from '../game-point/game-point.service';
 @Injectable()
 export class HistoryPlayService {
   constructor(
-    @Inject('HistoryPlayRepositoryInterface')
-    private readonly historyPlayRepository: HistoryPlayRepositoryInterface,
+    @Inject('HistoryPlayDiceRepositoryInterface')
+    private readonly HistoryPlayDiceRepository: HistoryPlayDiceRepositoryInterface,
     private readonly cacheService: RedisService,
     private readonly gamePointService: GamePointService,
     private readonly userPointService: UserPointService,
@@ -51,7 +51,7 @@ export class HistoryPlayService {
       this.cacheService.hset(keyCheckBetPosition, String(dto.answer), dto.point),
       // this.cacheService.sadd(`user-play-dice:${dto.transaction}`, keyCheckBetPosition),
     ]);
-    return this.historyPlayRepository.create({ ...dto, gamePointId, createdAt: new Date() });
+    return this.HistoryPlayDiceRepository.create({ ...dto, gamePointId, createdAt: new Date() });
   }
 
   async checkBalanceAndDeductPoint(slug: string, userId: number, points: number): Promise<number> {
@@ -62,7 +62,7 @@ export class HistoryPlayService {
   }
 
   findAllByDiceDetailId(diceDetailId: number) {
-    return this.historyPlayRepository.findAll(
+    return this.HistoryPlayDiceRepository.findAll(
       { diceDetailId },
       {
         projection: ['id', 'userId', 'gamePointId', 'point', 'answer'],
@@ -81,7 +81,7 @@ export class HistoryPlayService {
         [Op.lte]: dateTo,
       };
 
-    return this.historyPlayRepository.findAll(filter, {
+    return this.HistoryPlayDiceRepository.findAll(filter, {
       //
       sort,
       typeSort,
@@ -91,11 +91,11 @@ export class HistoryPlayService {
   }
 
   updateStatusByDiceDetailId(diceDetailId: number, status: number) {
-    return this.historyPlayRepository.updateMany({ diceDetailId }, { status: status });
+    return this.HistoryPlayDiceRepository.updateMany({ diceDetailId }, { status: status });
   }
 
   update(id: number, dto: any) {
-    return this.historyPlayRepository.findByIdAndUpdate(id, dto);
+    return this.HistoryPlayDiceRepository.findByIdAndUpdate(id, dto);
   }
 
   remove(id: number) {

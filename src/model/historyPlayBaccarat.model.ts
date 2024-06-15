@@ -1,17 +1,17 @@
 import { BeforeCount, BeforeFind, BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import { DataType } from 'sequelize-typescript';
-import { DiceDetailModel, GameDiceModel, addConditionNotDelete } from '.';
+import { BaccaratDetailsModel, GameBaccaratModel, addConditionNotDelete } from '.';
 import { StatusHistoryPlayGame } from 'src/constants';
 
 @Table({
-  tableName: 'HistoryPlayDices',
+  tableName: 'HistoryPlayBaccarats',
   timestamps: false,
   indexes: [
-    { name: 'gameDiceId_index', fields: ['gameDiceId'] },
-    { name: 'diceDetailId_index', fields: ['diceDetailId'] },
+    { name: 'gameBaccaratId_index', fields: ['gameBaccaratId'] },
+    { name: 'BaccaratDetailId_index', fields: ['BaccaratDetailId'] },
   ],
 })
-export class HistoryPlayDiceModel extends Model {
+export class HistoryPlayBaccaratModel extends Model {
   @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
   id: number;
 
@@ -30,19 +30,19 @@ export class HistoryPlayDiceModel extends Model {
   @Column({ type: DataType.INTEGER, defaultValue: StatusHistoryPlayGame.wait })
   status: number;
 
-  @ForeignKey(() => GameDiceModel)
+  @ForeignKey(() => GameBaccaratModel)
   @Column
-  gameDiceId: number;
+  gameBaccaratId: number;
 
-  @BelongsTo(() => GameDiceModel)
-  gameDice: GameDiceModel;
+  @BelongsTo(() => GameBaccaratModel)
+  gameBaccarat: GameBaccaratModel;
 
-  @ForeignKey(() => DiceDetailModel)
+  @ForeignKey(() => BaccaratDetailsModel)
   @Column
-  diceDetailId: number;
+  baccaratDetailId: number;
 
-  @BelongsTo(() => DiceDetailModel)
-  diceDetail: DiceDetailModel;
+  @BelongsTo(() => BaccaratDetailsModel)
+  baccaratDetail: BaccaratDetailsModel;
 
   @Column({ type: DataType.DATE })
   createdAt: Date;

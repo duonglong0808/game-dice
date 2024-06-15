@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HistoryPlayService } from './history-play.service';
 import { HistoryPlayController } from './history-play.controller';
-import { HistoryPlayRepository } from './repository/history-play.repository';
+import { HistoryPlayDiceRepository } from './repository/history-play-dice.repository';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { RedisService } from '../cache/redis.service';
 import { UserPointModule } from '../user-point/user-point.module';
@@ -21,8 +21,8 @@ import { HistoryPlayDiceModel } from 'src/model';
   providers: [
     HistoryPlayService,
     {
-      provide: 'HistoryPlayRepositoryInterface',
-      useClass: HistoryPlayRepository,
+      provide: 'HistoryPlayDiceRepositoryInterface',
+      useClass: HistoryPlayDiceRepository,
     },
     RedisService,
     UserPointService,
@@ -30,8 +30,8 @@ import { HistoryPlayDiceModel } from 'src/model';
   ],
   exports: [
     {
-      provide: 'HistoryPlayRepositoryInterface',
-      useClass: HistoryPlayRepository,
+      provide: 'HistoryPlayDiceRepositoryInterface',
+      useClass: HistoryPlayDiceRepository,
     },
   ],
 })

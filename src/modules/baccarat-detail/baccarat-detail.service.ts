@@ -88,7 +88,7 @@ export class BaccaratDetailService {
       case StatusBaccarat.prepare:
         return false;
       case StatusBaccarat.bet:
-        return 14;
+        return 19;
       case StatusBaccarat.waitOpen:
         return 2;
       case StatusBaccarat.check:
