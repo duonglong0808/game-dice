@@ -52,8 +52,8 @@ export class HistoryPlayController {
     name: 'typeSort',
     type: String,
   })
-  findAll(@Req() req: any, @Query('userId') userId: number, @Query('gameDiceId') gameDiceId: number, @Query('dateForm') dateForm: Date, @Query('dateTo') dateTo: Date, @Query('diceDetailId') diceDetailId: number, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
-    return this.historyPlayService.findAllCms(req['pagination'], diceDetailId, gameDiceId, userId, dateForm, dateTo, sort, typeSort);
+  findAll(@Req() req: any, @Query('userId') userId: number, @Query('game') game: string, @Query('gameDiceId') gameDiceId: number, @Query('diceDetailId') diceDetailId: number, @Query('gameBaccaratId') gameBaccaratId: number, @Query('baccaratDetailId') baccaratDetailId: number, @Query('dateForm') dateForm: Date, @Query('dateTo') dateTo: Date, @Query('sort') sort: string, @Query('typeSort') typeSort: string) {
+    return this.historyPlayService.findAllCms(req['pagination'], game, diceDetailId, gameDiceId, baccaratDetailId, gameBaccaratId, userId, dateForm, dateTo, sort, typeSort);
   }
 
   @Patch(':id')

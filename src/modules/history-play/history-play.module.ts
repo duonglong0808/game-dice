@@ -8,12 +8,13 @@ import { UserPointModule } from '../user-point/user-point.module';
 import { UserPointService } from '../user-point/user-point.service';
 import { GamePointModule } from '../game-point/game-point.module';
 import { GamePointService } from '../game-point/game-point.service';
-import { HistoryPlayDiceModel } from 'src/model';
+import { HistoryPlayBaccaratModel, HistoryPlayDiceModel } from 'src/model';
+import { HistoryPlayBaccaratRepository } from './repository/history-play-baccarat.repository';
 
 @Module({
   imports: [
     //
-    SequelizeModule.forFeature([HistoryPlayDiceModel]),
+    SequelizeModule.forFeature([HistoryPlayDiceModel, HistoryPlayBaccaratModel]),
     UserPointModule,
     GamePointModule,
   ],
@@ -24,6 +25,10 @@ import { HistoryPlayDiceModel } from 'src/model';
       provide: 'HistoryPlayDiceRepositoryInterface',
       useClass: HistoryPlayDiceRepository,
     },
+    {
+      provide: 'HistoryPlayBaccaratRepositoryInterface',
+      useClass: HistoryPlayBaccaratRepository,
+    },
     RedisService,
     UserPointService,
     GamePointService,
@@ -32,6 +37,10 @@ import { HistoryPlayDiceModel } from 'src/model';
     {
       provide: 'HistoryPlayDiceRepositoryInterface',
       useClass: HistoryPlayDiceRepository,
+    },
+    {
+      provide: 'HistoryPlayBaccaratRepositoryInterface',
+      useClass: HistoryPlayBaccaratRepository,
     },
   ],
 })

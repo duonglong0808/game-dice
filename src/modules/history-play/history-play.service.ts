@@ -8,12 +8,15 @@ import { Pagination } from 'src/middlewares';
 import { Op } from 'sequelize';
 import { UserPointService } from '../user-point/user-point.service';
 import { GamePointService } from '../game-point/game-point.service';
+import { HistoryPlayBaccaratRepositoryInterface } from './interface/history-play-baccarat.interface';
 
 @Injectable()
 export class HistoryPlayService {
   constructor(
     @Inject('HistoryPlayDiceRepositoryInterface')
-    private readonly HistoryPlayDiceRepository: HistoryPlayDiceRepositoryInterface,
+    private readonly historyPlayDiceRepository: HistoryPlayDiceRepositoryInterface,
+    @Inject('HistoryPlayBaccaratRepositoryInterface')
+    private readonly historyPlayBaccaratRepository: HistoryPlayBaccaratRepositoryInterface,
     private readonly cacheService: RedisService,
     private readonly gamePointService: GamePointService,
     private readonly userPointService: UserPointService,
@@ -36,22 +39,32 @@ export class HistoryPlayService {
 
   async create(dto: CreateHistoryPlayDto) {
     if (dto.point <= 0) throw new Error(messageResponse.system.dataInvalid);
-    const keyRunning = `${process.env.APP_NAME}:dice-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
+    let keyRunning = '';
+    if (dto.game == 'dice') {
+      keyRunning = `${process.env.APP_NAME}:dice-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
+    } else if (dto.game == 'mc-baccarat') {
+      keyRunning = `${process.env.APP_NAME}:baccarat-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
+    }
     const statusDice: string = await this.cacheService.get(keyRunning);
     if (+statusDice?.split(':')[0] != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
-    // Check các option đã chơi
-    const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}`;
 
     // trừ tiền
     const gamePointId = await this.checkBalanceAndDeductPoint('ku-casino', dto.userId, dto.point);
     if (!gamePointId) throw new Error(messageResponse.historyPlay.accountNotHaveEnoughPoints);
-    // Lưu lại lịch sử vừa chơi
-    await Promise.all([
-      //
-      this.cacheService.hset(keyCheckBetPosition, String(dto.answer), dto.point),
-      // this.cacheService.sadd(`user-play-dice:${dto.transaction}`, keyCheckBetPosition),
-    ]);
-    return this.HistoryPlayDiceRepository.create({ ...dto, gamePointId, createdAt: new Date() });
+    // // Check các option đã chơi
+    // const keyCheckBetPosition = `dice-play:${dto.gameDiceId}:${dto.transaction}`;
+    // // Lưu lại lịch sử vừa chơi
+    // await Promise.all([
+    //   //
+    //   this.cacheService.hset(keyCheckBetPosition, String(dto.answer), dto.point),
+    //   this.cacheService.sadd(`user-play-dice:${dto.transaction}`, keyCheckBetPosition),
+    // ]);
+    if (dto.game == 'dice') {
+      return this.historyPlayDiceRepository.create({ ...dto, gamePointId, createdAt: new Date() });
+    }
+    if (dto.game == 'mc-baccarat') {
+      return this.historyPlayBaccaratRepository.create({ ...dto, gamePointId, createdAt: new Date() });
+    }
   }
 
   async checkBalanceAndDeductPoint(slug: string, userId: number, points: number): Promise<number> {
@@ -62,7 +75,7 @@ export class HistoryPlayService {
   }
 
   findAllByDiceDetailId(diceDetailId: number) {
-    return this.HistoryPlayDiceRepository.findAll(
+    return this.historyPlayDiceRepository.findAll(
       { diceDetailId },
       {
         projection: ['id', 'userId', 'gamePointId', 'point', 'answer'],
@@ -70,10 +83,8 @@ export class HistoryPlayService {
     );
   }
 
-  findAllCms(pagination: Pagination, diceDetailId: number, gameDiceId: number, userId: number, dateFrom: Date, dateTo: Date, sort?: string, typeSort?: string) {
+  findAllCms(pagination: Pagination, game: string, diceDetailId: number, gameDiceId: number, baccaratDetailId: number, gameBaccaratId: number, userId: number, dateFrom: Date, dateTo: Date, sort?: string, typeSort?: string) {
     const filter: any = {};
-    if (diceDetailId) filter.diceDetailId = diceDetailId;
-    if (gameDiceId) filter.gameDiceId = gameDiceId;
     if (userId) filter.userId = userId;
     if (dateFrom && dateTo)
       filter.dateId = {
@@ -81,21 +92,45 @@ export class HistoryPlayService {
         [Op.lte]: dateTo,
       };
 
-    return this.HistoryPlayDiceRepository.findAll(filter, {
-      //
-      sort,
-      typeSort,
-      ...pagination,
-      projection: ['id', 'answer', 'point', 'status', 'gameDiceId', 'diceDetailId', 'userId', 'createdAt'],
-    });
+    if (game == 'dice') {
+      if (diceDetailId) filter.diceDetailId = diceDetailId;
+      if (gameDiceId) filter.gameDiceId = gameDiceId;
+      return this.historyPlayDiceRepository.findAll(filter, {
+        //
+        sort,
+        typeSort,
+        ...pagination,
+        projection: ['id', 'answer', 'point', 'status', 'gameDiceId', 'diceDetailId', 'userId', 'createdAt'],
+      });
+    }
+    if (game == 'mc-baccarat') {
+      if (baccaratDetailId) filter.baccaratDetailId = baccaratDetailId;
+      if (gameBaccaratId) filter.gameBaccaratId = gameBaccaratId;
+      return this.historyPlayBaccaratRepository.findAll(filter, {
+        //
+        sort,
+        typeSort,
+        ...pagination,
+        projection: ['id', 'answer', 'point', 'status', 'gameDiceId', 'diceDetailId', 'userId', 'createdAt'],
+      });
+    }
+
+    return null;
   }
 
   updateStatusByDiceDetailId(diceDetailId: number, status: number) {
-    return this.HistoryPlayDiceRepository.updateMany({ diceDetailId }, { status: status });
+    return this.historyPlayDiceRepository.updateMany({ diceDetailId }, { status: status });
+  }
+
+  updateStatusByBaccaratDetailId(baccaratDetailId: number, status: number) {
+    return this.historyPlayBaccaratRepository.updateMany({ baccaratDetailId }, { status: status });
   }
 
   update(id: number, dto: any) {
-    return this.HistoryPlayDiceRepository.findByIdAndUpdate(id, dto);
+    if (dto.game == 'dice') {
+      return this.historyPlayDiceRepository.findByIdAndUpdate(id, dto);
+    }
+    return this.historyPlayBaccaratRepository.findByIdAndUpdate(id, dto);
   }
 
   remove(id: number) {

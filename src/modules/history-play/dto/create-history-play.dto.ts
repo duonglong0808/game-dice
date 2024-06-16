@@ -11,6 +11,12 @@ export class CreateHistoryPlayDto {
   @ApiProperty({ name: 'diceDetailId', description: 'Id phiên', type: Number })
   diceDetailId: number;
 
+  @ApiProperty({ name: 'gameBaccaratId', description: 'Id game', type: Number })
+  gameBaccaratId: number;
+
+  @ApiProperty({ name: 'baccaratDetailId', description: 'Id phiên', type: Number })
+  baccaratDetailId: number;
+
   @ApiProperty({ name: 'answer', description: 'Đáp án người dùng chọn', type: Number, example: TypeAnswerDice.p1 })
   answer: number;
 
@@ -19,4 +25,7 @@ export class CreateHistoryPlayDto {
 
   @ApiProperty({ name: 'point', description: 'Số điểm đặt', type: Number })
   point: number;
+
+  @ApiProperty({ name: 'game', description: 'Game ', type: String })
+  game: string;
 }

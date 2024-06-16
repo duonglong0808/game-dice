@@ -109,16 +109,16 @@ export class BaccaratDetailService {
     switch (baccaratDetail.status) {
       case StatusBaccarat.prepare:
         baccaratDetail.status = StatusBaccarat.bet;
-        await this.cacheService.set(key, StatusBaccarat.bet, 10);
+        await this.cacheService.set(key, `${StatusBaccarat.bet}:${date + countDown}`, 19);
         break;
 
       case StatusBaccarat.bet:
-        await this.cacheService.set(key, StatusBaccarat.waitOpen, 60);
+        await this.cacheService.set(key, StatusBaccarat.waitOpen, 3);
         baccaratDetail.status = StatusBaccarat.waitOpen;
         break;
       case StatusBaccarat.waitOpen:
         baccaratDetail.status = StatusBaccarat.showPoker;
-        await this.cacheService.set(key, StatusBaccarat.showPoker, 20);
+        await this.cacheService.set(key, StatusBaccarat.showPoker, 2);
 
         break;
       case StatusBaccarat.showPoker:
@@ -136,7 +136,6 @@ export class BaccaratDetailService {
           baccaratDetail.status = StatusBaccarat.check;
           baccaratDetail.pointBanker = totalPointBanker;
           baccaratDetail.pointPlayer = totalPointPlayer;
-
           await this.cacheService.set(key, StatusBaccarat.showPoker, 20);
         }
         baccaratDetail.pokerPlayer = JSON.stringify(dto.pokerPlayer);
@@ -151,16 +150,16 @@ export class BaccaratDetailService {
         throw new Error(messageResponse.baccaratDetail.transactionIsFinished);
         break;
     }
-    // await this.sendMessageWsService.updateStatusBaccarat(
-    //   //
-    //   baccaratDetail.gameBaccaratId,
-    //   baccaratDetail.id,
-    //   baccaratDetail.transaction,
-    //   baccaratDetail.mainTransaction,
-    //   baccaratDetail.status == StatusBaccarat.bet ? `${StatusBaccarat.bet}:${date + countDown}` : baccaratDetail.status,
-    //   JSON.stringify(dto.pokerPlayer),
-    //   JSON.stringify(dto.pokerBanker),
-    // );
+    await this.sendMessageWsService.updateStatusBaccarat(
+      //
+      baccaratDetail.gameBaccaratId,
+      baccaratDetail.id,
+      baccaratDetail.transaction,
+      baccaratDetail.mainTransaction,
+      baccaratDetail.status == StatusBaccarat.bet ? `${StatusBaccarat.bet}:${date + countDown}` : baccaratDetail.status,
+      JSON.stringify(dto.pokerPlayer),
+      JSON.stringify(dto.pokerBanker),
+    );
     await baccaratDetail.save();
 
     // Auto update and create new dice transaction
