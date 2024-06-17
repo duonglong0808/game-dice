@@ -105,13 +105,12 @@ export class BaccaratDetailService {
     if (!baccaratDetail) throw new Error(messageResponse.system.idInvalid);
     const key = `${process.env.APP_NAME}:baccarat-detail:${baccaratDetail.gameBaccaratId}:${baccaratDetail.id}:${baccaratDetail.transaction}`;
     const date = new Date().getTime();
-    const countDown = 14 * 1000;
+    const countDown = 19 * 1000;
     switch (baccaratDetail.status) {
       case StatusBaccarat.prepare:
         baccaratDetail.status = StatusBaccarat.bet;
         await this.cacheService.set(key, `${StatusBaccarat.bet}:${date + countDown}`, 19);
         break;
-
       case StatusBaccarat.bet:
         await this.cacheService.set(key, StatusBaccarat.waitOpen, 3);
         baccaratDetail.status = StatusBaccarat.waitOpen;
@@ -119,7 +118,6 @@ export class BaccaratDetailService {
       case StatusBaccarat.waitOpen:
         baccaratDetail.status = StatusBaccarat.showPoker;
         await this.cacheService.set(key, StatusBaccarat.showPoker, 2);
-
         break;
       case StatusBaccarat.showPoker:
         baccaratDetail.status = StatusBaccarat.showPoker;
@@ -136,7 +134,14 @@ export class BaccaratDetailService {
           baccaratDetail.status = StatusBaccarat.check;
           baccaratDetail.pointBanker = totalPointBanker;
           baccaratDetail.pointPlayer = totalPointPlayer;
-          await this.cacheService.set(key, StatusBaccarat.showPoker, 20);
+          await this.cacheService.set(key, StatusBaccarat.check, 20);
+          this.bullQueueService.addToQueueCalcPointBaccarat({
+            baccaratDetailId: baccaratDetail.id,
+            pokerBanker: dto.pokerBanker,
+            pokerPlayer: dto.pokerPlayer,
+            pointBanker: totalPointBanker,
+            pointPlayer: totalPointPlayer,
+          });
         }
         baccaratDetail.pokerPlayer = JSON.stringify(dto.pokerPlayer);
         baccaratDetail.pokerBanker = JSON.stringify(dto.pokerBanker);
@@ -157,8 +162,8 @@ export class BaccaratDetailService {
       baccaratDetail.transaction,
       baccaratDetail.mainTransaction,
       baccaratDetail.status == StatusBaccarat.bet ? `${StatusBaccarat.bet}:${date + countDown}` : baccaratDetail.status,
-      JSON.stringify(dto.pokerPlayer),
-      JSON.stringify(dto.pokerBanker),
+      JSON.stringify(dto.pokerPlayer || []),
+      JSON.stringify(dto.pokerBanker || []),
     );
     await baccaratDetail.save();
 
@@ -172,7 +177,7 @@ export class BaccaratDetailService {
           mainTransaction: `${baccaratDetail.mainTransaction.split('-')[0]}-${+baccaratDetail.mainTransaction.split('-')[1] + 1}`,
           transaction: baccaratDetail.transaction,
         };
-        const newBaccaratDetail = await this.create(createDto);
+        await this.create(createDto);
       } else {
         this.bullQueueService.addToQueueAutoUpdateStatusBaccarat({ baccaratDetailId: baccaratDetail.id }, timeDelay);
       }

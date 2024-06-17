@@ -66,6 +66,11 @@ export const TypeAnswerDice = {
   p10: 10,
 };
 
+export const TypePlayGameBaccarat = {
+  old: 'old',
+  all: 'all',
+};
+
 export const TypeAnswerBaccarat = {
   p1: 1, //Con đôi
   p2: 2, // Con long bao

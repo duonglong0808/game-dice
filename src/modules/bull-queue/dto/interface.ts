@@ -4,6 +4,15 @@ export interface DataJobCalcPointDice {
   totalRed: number;
 }
 
+export interface DataJobCalcPointBaccarat {
+  baccaratDetailId: number;
+  pokerPlayer: string[];
+  pokerBanker: string[];
+  pointPlayer: number;
+  pointBanker: number;
+  // transactionId: number;
+}
+
 export interface DataJobAddPointToUser {
   userId: number;
   gamePointId: number;

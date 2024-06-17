@@ -2,7 +2,7 @@ import { BullModule } from '@nestjs/bull';
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
-import { BullQueueConsumerServiceAddPointToUser, BullQueueConsumerServiceCalcPointDice, BullQueueConsumerServiceUpdateStatusBaccarat, BullQueueConsumerServiceUpdateStatusDice } from './bullqueueConsumer.service';
+import { BullQueueConsumerServiceAddPointToUser, BullQueueConsumerServiceCalcPointBaccarat, BullQueueConsumerServiceCalcPointDice, BullQueueConsumerServiceUpdateStatusBaccarat, BullQueueConsumerServiceUpdateStatusDice } from './bullqueueConsumer.service';
 import { BullQueueService } from './bullqueue.service';
 import { HistoryPlayModule } from '../history-play/history-play.module';
 import { HistoryPlayService } from '../history-play/history-play.service';
@@ -54,6 +54,9 @@ import { BaccaratModule } from '../baccarat/baccarat.module';
         name: 'calc-point-dice',
       },
       {
+        name: 'calc-point-baccarat',
+      },
+      {
         name: 'add-point-to-user',
       },
       {
@@ -77,6 +80,7 @@ import { BaccaratModule } from '../baccarat/baccarat.module';
     BullQueueConsumerServiceAddPointToUser,
     BullQueueConsumerServiceUpdateStatusDice,
     BullQueueConsumerServiceUpdateStatusBaccarat,
+    BullQueueConsumerServiceCalcPointBaccarat,
     BullQueueService,
     HistoryPlayService,
     UserPointService,

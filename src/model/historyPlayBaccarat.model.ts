@@ -21,6 +21,9 @@ export class HistoryPlayBaccaratModel extends Model {
   @Column({ type: DataType.INTEGER })
   gamePointId: number;
 
+  @Column({ type: DataType.STRING })
+  type: string;
+
   @Column({ type: DataType.INTEGER })
   answer: number;
 

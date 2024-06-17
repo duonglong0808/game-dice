@@ -46,7 +46,7 @@ export class HistoryPlayService {
       keyRunning = `${process.env.APP_NAME}:baccarat-detail:${dto.gameDiceId}:${dto.diceDetailId}:${dto.transaction}`;
     }
     const statusDice: string = await this.cacheService.get(keyRunning);
-    if (+statusDice?.split(':')[0] != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
+    // if (+statusDice?.split(':')[0] != StatusDiceDetail.bet) throw new Error(messageResponse.historyPlay.outsideBettingTime);
 
     // trừ tiền
     const gamePointId = await this.checkBalanceAndDeductPoint('ku-casino', dto.userId, dto.point);
@@ -77,6 +77,15 @@ export class HistoryPlayService {
   findAllByDiceDetailId(diceDetailId: number) {
     return this.historyPlayDiceRepository.findAll(
       { diceDetailId },
+      {
+        projection: ['id', 'userId', 'gamePointId', 'point', 'answer'],
+      },
+    );
+  }
+
+  findAllByBaccaratDetailId(baccaratDetailId: number) {
+    return this.historyPlayBaccaratRepository.findAll(
+      { baccaratDetailId },
       {
         projection: ['id', 'userId', 'gamePointId', 'point', 'answer'],
       },

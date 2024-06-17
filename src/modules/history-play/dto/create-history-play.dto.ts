@@ -28,4 +28,7 @@ export class CreateHistoryPlayDto {
 
   @ApiProperty({ name: 'game', description: 'Game ', type: String })
   game: string;
+
+  @ApiProperty({ name: 'type', description: 'loại chơi ', type: String })
+  type: string;
 }
