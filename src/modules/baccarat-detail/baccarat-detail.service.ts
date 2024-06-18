@@ -83,21 +83,24 @@ export class BaccaratDetailService {
     }
   }
 
-  getTimeDelayQueueUpdateStatus(status: number) {
-    switch (status) {
-      case StatusBaccarat.prepare:
-        return false;
-      case StatusBaccarat.bet:
-        return 19;
-      case StatusBaccarat.waitOpen:
-        return 2;
-      case StatusBaccarat.check:
-        return 5;
-      case StatusBaccarat.end:
-        return 1;
-      default:
-        return false;
+  getTimeDelayQueueUpdateStatus(status: number, nextStep: boolean) {
+    if (nextStep) {
+      switch (status) {
+        case StatusBaccarat.prepare:
+          return false;
+        case StatusBaccarat.bet:
+          return 19;
+        case StatusBaccarat.showPoker:
+          return 2;
+        case StatusBaccarat.check:
+          return 5;
+        case StatusBaccarat.end:
+          return 1;
+        default:
+          return false;
+      }
     }
+    return false;
   }
 
   async updateStatus(id: number, dto?: UpdateStatusBaccaratDetailDto) {
@@ -106,49 +109,64 @@ export class BaccaratDetailService {
     const key = `${process.env.APP_NAME}:baccarat-detail:${baccaratDetail.gameBaccaratId}:${baccaratDetail.id}:${baccaratDetail.transaction}`;
     const date = new Date().getTime();
     const countDown = 19 * 1000;
+    let nextStep = false; //Chuyển trạng thái
     switch (baccaratDetail.status) {
       case StatusBaccarat.prepare:
         baccaratDetail.status = StatusBaccarat.bet;
+        nextStep = true;
         await this.cacheService.set(key, `${StatusBaccarat.bet}:${date + countDown}`, 19);
         break;
       case StatusBaccarat.bet:
-        await this.cacheService.set(key, StatusBaccarat.waitOpen, 3);
         baccaratDetail.status = StatusBaccarat.waitOpen;
+        nextStep = true;
+        await this.cacheService.set(key, StatusBaccarat.waitOpen, 3);
         break;
       case StatusBaccarat.waitOpen:
         baccaratDetail.status = StatusBaccarat.showPoker;
+        nextStep = true;
         await this.cacheService.set(key, StatusBaccarat.showPoker, 2);
         break;
       case StatusBaccarat.showPoker:
-        baccaratDetail.status = StatusBaccarat.showPoker;
-        const totalPointPlayer = dto.pokerPlayer.reduce((pre, player) => (pre += pointPoker[player.split('_')[1].slice(1)]), 0) % 10;
-        const totalPointBanker = dto.pokerBanker.reduce((pre, player) => (pre += pointPoker[player.split('_')[1].slice(1)]), 0) % 10;
-
-        // Kiểm tra điều kiện rút bài của Player
-        const playerNeedsCard = dto.pokerPlayer.length == 2 && totalPointPlayer <= 5;
-
-        // Kiểm tra điều kiện rút bài của Banker
-        const bankerNeedsCard = dto.pokerBanker.length == 2 && (totalPointBanker <= 2 || (totalPointBanker == 3 && totalPointPlayer !== 8) || (totalPointBanker == 4 && [2, 3, 4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 5 && [4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 6 && [6, 7].includes(totalPointPlayer)));
-
-        if ((dto.pokerPlayer.length == 3 && dto.pokerBanker.length == 3) || totalPointPlayer >= 9 || totalPointBanker >= 9 || (!playerNeedsCard && !bankerNeedsCard)) {
+        if (baccaratDetail.pointBanker) {
           baccaratDetail.status = StatusBaccarat.check;
-          baccaratDetail.pointBanker = totalPointBanker;
-          baccaratDetail.pointPlayer = totalPointPlayer;
-          await this.cacheService.set(key, StatusBaccarat.check, 20);
-          this.bullQueueService.addToQueueCalcPointBaccarat({
-            baccaratDetailId: baccaratDetail.id,
-            pokerBanker: dto.pokerBanker,
-            pokerPlayer: dto.pokerPlayer,
-            pointBanker: totalPointBanker,
-            pointPlayer: totalPointPlayer,
-          });
+          nextStep = true;
+        } else {
+          baccaratDetail.status = StatusBaccarat.showPoker;
+
+          const totalPointPlayer = dto.pokerPlayer.reduce((pre, player) => (pre += pointPoker[player.split('_')[1].slice(1)]), 0) % 10;
+          const totalPointBanker = dto.pokerBanker.reduce((pre, player) => (pre += pointPoker[player.split('_')[1].slice(1)]), 0) % 10;
+
+          // Kiểm tra nếu cả hai bên có đủ 2 lá bài và bất kỳ bên nào có điểm là 8 hoặc 9 (Natural)
+          const isNatural = dto.pokerPlayer.length == 2 && dto.pokerBanker.length == 2 && (totalPointPlayer >= 8 || totalPointBanker >= 8);
+
+          // Kiểm tra điều kiện rút bài của Player
+          const playerNeedsCard = dto.pokerPlayer.length < 2 || (!isNatural && dto.pokerPlayer.length == 2 && totalPointPlayer <= 5);
+
+          // Kiểm tra điều kiện rút bài của Banker
+          const bankerNeedsCard = dto.pokerBanker.length < 2 || (!isNatural && dto.pokerBanker.length == 2 && (totalPointBanker <= 2 || (totalPointBanker == 3 && totalPointPlayer !== 8) || (totalPointBanker == 4 && [2, 3, 4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 5 && [4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 6 && [6, 7].includes(totalPointPlayer))));
+
+          if (isNatural || (dto.pokerPlayer.length == 3 && dto.pokerBanker.length == 3) || (!playerNeedsCard && !bankerNeedsCard)) {
+            nextStep = true;
+            baccaratDetail.pointBanker = totalPointBanker;
+            baccaratDetail.pointPlayer = totalPointPlayer;
+            await this.cacheService.set(key, StatusBaccarat.check, 20);
+            this.bullQueueService.addToQueueCalcPointBaccarat({
+              baccaratDetailId: baccaratDetail.id,
+              pokerBanker: dto.pokerBanker,
+              pokerPlayer: dto.pokerPlayer,
+              pointBanker: totalPointBanker,
+              pointPlayer: totalPointPlayer,
+            });
+          }
+          baccaratDetail.pokerPlayer = JSON.stringify(dto.pokerPlayer);
+          baccaratDetail.pokerBanker = JSON.stringify(dto.pokerBanker);
         }
-        baccaratDetail.pokerPlayer = JSON.stringify(dto.pokerPlayer);
-        baccaratDetail.pokerBanker = JSON.stringify(dto.pokerBanker);
         break;
+
       case StatusBaccarat.check:
         await this.cacheService.delete(key);
         baccaratDetail.status = StatusBaccarat.end;
+        nextStep = true;
         break;
 
       default:
@@ -168,7 +186,7 @@ export class BaccaratDetailService {
     await baccaratDetail.save();
 
     // Auto update and create new dice transaction
-    const timeDelay = this.getTimeDelayQueueUpdateStatus(baccaratDetail.status);
+    const timeDelay = this.getTimeDelayQueueUpdateStatus(baccaratDetail.status, nextStep);
     if (timeDelay) {
       if (baccaratDetail.status == StatusBaccarat.end) {
         const createDto: CreateBaccaratDetailDto = {

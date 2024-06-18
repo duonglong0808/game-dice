@@ -105,7 +105,7 @@ export const pointPoker = {
   10: 0,
   J: 0,
   Q: 0,
-  K: 10,
+  K: 0,
 };
 
 export * from './message';
