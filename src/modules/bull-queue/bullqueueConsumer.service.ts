@@ -257,7 +257,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
         }
 
         // Con long bảo
-        if (pointPlayer - pointBanker > 4 && userAnswer.answer == TypeAnswerBaccarat.p2) {
+        if (pointPlayer - pointBanker >= 4 && userAnswer.answer == TypeAnswerBaccarat.p2) {
           let rate: boolean | number = false;
           if (valuePokerPlayer[0] + valuePokerPlayer[1] >= 8) {
             rate = 1;

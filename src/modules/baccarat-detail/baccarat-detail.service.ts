@@ -162,8 +162,8 @@ export class BaccaratDetailService {
       baccaratDetail.transaction,
       baccaratDetail.mainTransaction,
       baccaratDetail.status == StatusBaccarat.bet ? `${StatusBaccarat.bet}:${date + countDown}` : baccaratDetail.status,
-      JSON.stringify(dto.pokerPlayer || []),
-      JSON.stringify(dto.pokerBanker || []),
+      dto?.pokerPlayer?.join(','),
+      dto?.pokerBanker?.join(','),
     );
     await baccaratDetail.save();
 
