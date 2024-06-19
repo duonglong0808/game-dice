@@ -46,7 +46,7 @@ export class BaccaratDetailService {
         limit: 240,
         sort: 'id',
         typeSort: 'DESC',
-        projection: ['id', 'transaction', 'mainTransaction', 'pokerPlayer', 'pokerBanker', 'status', 'dateId', 'gameBaccaratId', 'id'],
+        projection: ['id', 'transaction', 'mainTransaction', 'pokerPlayer', 'pokerBanker', 'pointPlayer', 'pointBanker', 'status', 'gameBaccaratId', 'id'],
       },
     );
     return {
@@ -89,13 +89,13 @@ export class BaccaratDetailService {
         case StatusBaccarat.prepare:
           return false;
         case StatusBaccarat.bet:
-          return 19;
+          return 17;
         case StatusBaccarat.showPoker:
-          return 2;
+          return 4.5;
         case StatusBaccarat.check:
           return 5;
         case StatusBaccarat.end:
-          return 1;
+          return false;
         default:
           return false;
       }
@@ -104,11 +104,11 @@ export class BaccaratDetailService {
   }
 
   async updateStatus(id: number, dto?: UpdateStatusBaccaratDetailDto) {
-    const baccaratDetail = await this.baccaratDetailRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'gameBaccaratId', 'status', 'pokerPlayer', 'pokerBanker']);
+    const baccaratDetail = await this.baccaratDetailRepository.findOneById(id, ['id', 'transaction', 'mainTransaction', 'gameBaccaratId', 'status', 'pokerPlayer', 'pokerBanker', 'pointBanker']);
     if (!baccaratDetail) throw new Error(messageResponse.system.idInvalid);
     const key = `${process.env.APP_NAME}:baccarat-detail:${baccaratDetail.gameBaccaratId}:${baccaratDetail.id}:${baccaratDetail.transaction}`;
     const date = new Date().getTime();
-    const countDown = 19 * 1000;
+    const countDown = 17 * 1000;
     let nextStep = false; //Chuyển trạng thái
     switch (baccaratDetail.status) {
       case StatusBaccarat.prepare:
@@ -121,11 +121,8 @@ export class BaccaratDetailService {
         nextStep = true;
         await this.cacheService.set(key, StatusBaccarat.waitOpen, 3);
         break;
+
       case StatusBaccarat.waitOpen:
-        baccaratDetail.status = StatusBaccarat.showPoker;
-        nextStep = true;
-        await this.cacheService.set(key, StatusBaccarat.showPoker, 2);
-        break;
       case StatusBaccarat.showPoker:
         if (baccaratDetail.pointBanker) {
           baccaratDetail.status = StatusBaccarat.check;
@@ -138,12 +135,11 @@ export class BaccaratDetailService {
 
           // Kiểm tra nếu cả hai bên có đủ 2 lá bài và bất kỳ bên nào có điểm là 8 hoặc 9 (Natural)
           const isNatural = dto.pokerPlayer.length == 2 && dto.pokerBanker.length == 2 && (totalPointPlayer >= 8 || totalPointBanker >= 8);
-
           // Kiểm tra điều kiện rút bài của Player
           const playerNeedsCard = dto.pokerPlayer.length < 2 || (!isNatural && dto.pokerPlayer.length == 2 && totalPointPlayer <= 5);
-
           // Kiểm tra điều kiện rút bài của Banker
-          const bankerNeedsCard = dto.pokerBanker.length < 2 || (!isNatural && dto.pokerBanker.length == 2 && (totalPointBanker <= 2 || (totalPointBanker == 3 && totalPointPlayer !== 8) || (totalPointBanker == 4 && [2, 3, 4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 5 && [4, 5, 6, 7].includes(totalPointPlayer)) || (totalPointBanker == 6 && [6, 7].includes(totalPointPlayer))));
+          const pointCardThreePayer = +dto.pokerPlayer[3]?.split('_')[1].slice(1);
+          const bankerNeedsCard = dto.pokerBanker.length < 2 || (!isNatural && dto.pokerBanker.length == 2 && (totalPointBanker <= 2 || (totalPointBanker == 3 && pointCardThreePayer != 8) || (totalPointBanker == 4 && [2, 3, 4, 5, 6, 7].includes(pointCardThreePayer)) || (totalPointBanker == 5 && [4, 5, 6, 7].includes(pointCardThreePayer)) || (totalPointBanker == 6 && [6, 7].includes(pointCardThreePayer))));
 
           if (isNatural || (dto.pokerPlayer.length == 3 && dto.pokerBanker.length == 3) || (!playerNeedsCard && !bankerNeedsCard)) {
             nextStep = true;
@@ -180,8 +176,8 @@ export class BaccaratDetailService {
       baccaratDetail.transaction,
       baccaratDetail.mainTransaction,
       baccaratDetail.status == StatusBaccarat.bet ? `${StatusBaccarat.bet}:${date + countDown}` : baccaratDetail.status,
-      dto?.pokerPlayer?.join(','),
-      dto?.pokerBanker?.join(','),
+      JSON.parse(baccaratDetail.pokerPlayer ? baccaratDetail.pokerPlayer : '[]')?.join(','),
+      JSON.parse(baccaratDetail.pokerBanker ? baccaratDetail.pokerBanker : '[]')?.join(','),
     );
     await baccaratDetail.save();
 

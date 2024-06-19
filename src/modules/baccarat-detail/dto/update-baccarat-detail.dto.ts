@@ -10,6 +10,9 @@ export class UpdateStatusBaccaratDetailDto {
 
   @ApiProperty({ name: 'pokerBanker', type: [String], description: 'Danh sách bài banker' })
   pokerBanker: string[];
+
+  @ApiProperty({ name: 'isStopCard', type: Boolean, description: 'Danh sách bài banker' })
+  isStopCard: string[];
 }
 
 export class UpdateStatusBaccaratDetailBotDto {
@@ -24,4 +27,7 @@ export class UpdateStatusBaccaratDetailBotDto {
 
   @ApiProperty({ name: 'transaction', type: Number, description: 'phiên ở trang chính' })
   mainTransaction: number;
+
+  @ApiProperty({ name: 'isStopCard', type: Boolean, description: 'Danh sách bài banker' })
+  isStopCard: string[];
 }

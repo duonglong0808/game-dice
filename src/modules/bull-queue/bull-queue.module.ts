@@ -38,7 +38,7 @@ import { BaccaratModule } from '../baccarat/baccarat.module';
           });
         },
         defaultJobOptions: {
-          attempts: 20,
+          attempts: 3,
           removeOnComplete: true,
           removeOnFail: false,
           backoff: {
