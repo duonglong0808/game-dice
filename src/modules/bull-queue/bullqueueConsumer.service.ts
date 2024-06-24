@@ -30,7 +30,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p1 && totalRed == 0) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 14;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -41,7 +41,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         } else if (userAnswer.answer == TypeAnswerDice.p8 && totalRed == 4) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 14;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -52,7 +52,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         } else if (userAnswer.answer == TypeAnswerDice.p10) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 6.5;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -68,7 +68,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p2 && totalRed == 1) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 2.8;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -79,7 +79,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         } else if (userAnswer.answer == TypeAnswerDice.p9 && totalRed == 3) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 2.8;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -94,7 +94,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p3) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 1.5;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -111,7 +111,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p4) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 0.96;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -128,7 +128,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p6 || userAnswer.answer == TypeAnswerDice.p5) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 0.96;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -145,7 +145,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p4) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 0.96;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -162,7 +162,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p6 || userAnswer.answer == TypeAnswerDice.p7) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 0.96;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -179,7 +179,7 @@ export class BullQueueConsumerServiceCalcPointDice {
         if (userAnswer.answer == TypeAnswerDice.p4 || userAnswer.answer == TypeAnswerDice.p7) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 0.96;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -192,6 +192,7 @@ export class BullQueueConsumerServiceCalcPointDice {
     }
 
     // calc total bet
+    dataUserUpPoint.forEach((userPoint) => (userPoint.points = Math.ceil(userPoint.points)));
     if (listUser.length) {
       const totalBet = listUser.reduce((pre, item) => pre + item.point, 0);
       console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ totalBet:', totalBet);
@@ -236,7 +237,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
         if ((userAnswer.answer == TypeAnswerBaccarat.p1 && valuePokerPlayer[0] == valuePokerPlayer[1]) || (userAnswer.answer == TypeAnswerBaccarat.p7 && valuePokerBanker[0] == valuePokerBanker[1])) {
           const user = dataUserUpPoint.find((user) => user.userId);
           const points = userAnswer.point + userAnswer.point * 14;
-          if (user) user.points += Math.ceil(points);
+          if (user) user.points += points;
           else
             dataUserUpPoint.push({
               gamePointId: userAnswer.gamePointId,
@@ -290,7 +291,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
           }
         }
 
-        if (user) user.points += Math.ceil(points);
+        if (user) user.points += points;
         else {
           dataUserUpPoint.push({
             gamePointId: userAnswer.gamePointId,
@@ -351,7 +352,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
           points += userAnswer.point + userAnswer.point * rate;
         }
 
-        if (user) user.points += Math.ceil(points);
+        if (user) user.points += points;
         else {
           dataUserUpPoint.push({
             gamePointId: userAnswer.gamePointId,
@@ -374,7 +375,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
           points += userAnswer.point;
         }
         const user = dataUserUpPoint.find((user) => user.userId);
-        if (user) user.points += Math.ceil(points);
+        if (user) user.points += points;
         else {
           dataUserUpPoint.push({
             gamePointId: userAnswer.gamePointId,
@@ -387,6 +388,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
     });
 
     // calc total bet
+    dataUserUpPoint.forEach((userPoint) => (userPoint.points = Math.ceil(userPoint.points)));
     if (listUser.length) {
       const totalBet = listUser.reduce((pre, item) => pre + item.point, 0);
       console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ totalBet:', totalBet);
