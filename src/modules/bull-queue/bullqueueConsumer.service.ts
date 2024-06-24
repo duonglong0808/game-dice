@@ -223,20 +223,45 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
   ) {}
 
   @Process()
-  async calcPointDice(job: Job<DataJobCalcPointBaccarat>) {
+  async calcPointBaccarat(job: Job<DataJobCalcPointBaccarat>) {
     const data = job.data;
-    console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ calcPointDice ~ data:', data);
+    console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ calcPointBaccarat ~ data:', data);
     const { baccaratDetailId, pokerPlayer, pokerBanker, pointBanker, pointPlayer } = data;
     const { data: listUser } = await this.historyPlayService.findAllByBaccaratDetailId(baccaratDetailId);
     const dataUserUpPoint: DataJobAddPointToUser[] = [];
     const valuePokerPlayer: number[] = pokerPlayer.map((pk) => pointPoker[pk.split('_')[1].slice(1)]);
     const valuePokerBanker: number[] = pokerBanker.map((pk) => pointPoker[pk.split('_')[1].slice(1)]);
+    const isNatural = (pokerPlayer.length == 2 && pointPlayer >= 8) || (pokerBanker.length == 2 && pointBanker >= 8);
     listUser.forEach((userAnswer) => {
-      // Con đôi hoặc cái đôi
+      // Con đôi, cái đôi, đôi bất kỳ hoặc đôi hoàn mỹ
       if (valuePokerPlayer[0] == valuePokerPlayer[1] || valuePokerBanker[0] == valuePokerBanker[1]) {
         if ((userAnswer.answer == TypeAnswerBaccarat.p1 && valuePokerPlayer[0] == valuePokerPlayer[1]) || (userAnswer.answer == TypeAnswerBaccarat.p7 && valuePokerBanker[0] == valuePokerBanker[1])) {
           const user = dataUserUpPoint.find((user) => user.userId);
-          const points = userAnswer.point + userAnswer.point * 14;
+          const points = userAnswer.point + userAnswer.point * 11;
+          if (user) user.points += points;
+          else
+            dataUserUpPoint.push({
+              gamePointId: userAnswer.gamePointId,
+              userId: userAnswer.userId,
+              points,
+              type: TypeUpdatePointUser.up,
+            });
+        } else if (userAnswer.answer == TypeAnswerBaccarat.p9) {
+          // Đôi bất kỳ
+          const user = dataUserUpPoint.find((user) => user.userId);
+          const points = userAnswer.point + userAnswer.point * 5;
+          if (user) user.points += points;
+          else
+            dataUserUpPoint.push({
+              gamePointId: userAnswer.gamePointId,
+              userId: userAnswer.userId,
+              points,
+              type: TypeUpdatePointUser.up,
+            });
+        } else if (userAnswer.answer == TypeAnswerBaccarat.p11 && (pokerBanker[0] == pokerBanker[1] || pokerPlayer[0] == pokerPlayer[1])) {
+          // Đôi hoàn mĩ
+          const user = dataUserUpPoint.find((user) => user.userId);
+          const points = userAnswer.point + userAnswer.point * 25;
           if (user) user.points += points;
           else
             dataUserUpPoint.push({
@@ -385,24 +410,38 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
           });
         }
       }
+
+      //Con bài chuẩn hoặc cái bài chuẩn
+      if (isNatural && [TypeAnswerBaccarat.p10, TypeAnswerBaccarat.p12].includes(userAnswer.answer)) {
+        const user = dataUserUpPoint.find((user) => user.userId);
+        const points = userAnswer.point + userAnswer.point * 4;
+        if (user) user.points += points;
+        else
+          dataUserUpPoint.push({
+            gamePointId: userAnswer.gamePointId,
+            userId: userAnswer.userId,
+            points,
+            type: TypeUpdatePointUser.up,
+          });
+      }
     });
 
     // calc total bet
     dataUserUpPoint.forEach((userPoint) => (userPoint.points = Math.ceil(userPoint.points)));
     if (listUser.length) {
       const totalBet = listUser.reduce((pre, item) => pre + item.point, 0);
-      console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ totalBet:', totalBet);
+      console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ calcPointBaccarat ~ totalBet:', totalBet);
       const totalReward = dataUserUpPoint.reduce((pre, item) => pre + item.points, 0) || 0;
-      console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ totalReward:', totalReward);
+      console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ calcPointBaccarat ~ totalReward:', totalReward);
       this.baccaratDetailService.updateDataBetAndReward(baccaratDetailId, totalBet, totalReward);
     }
-    console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ calcPointDice ~ dataUserUpPoint:', dataUserUpPoint);
+    console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ calcPointBaccarat ~ dataUserUpPoint:', dataUserUpPoint);
     this.historyPlayService.updateStatusByBaccaratDetailId(baccaratDetailId, 1);
     return this.updatePointUserAndSendWs(dataUserUpPoint);
   }
 
   async updatePointUserAndSendWs(dataUserUpPoint: DataJobAddPointToUser[]) {
-    // console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ updatePointUserAndSendWs ~ dataUserUpPoint:', dataUserUpPoint);
+    // console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ updatePointUserAndSendWs ~ dataUserUpPoint:', dataUserUpPoint);
     if (dataUserUpPoint.length) {
       await this.sendMessageWsService.upPointByUser(dataUserUpPoint);
       this.bullQueueService.addToQueueAddPointToUser(dataUserUpPoint);
