@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { BaccaratDetailService } from './baccarat-detail.service';
 import { BaccaratDetailController } from './baccarat-detail.controller';
 import { BullQueueModule } from '../bull-queue/bull-queue.module';
@@ -15,7 +15,7 @@ import { SendMessageWsService } from '../send-message-ws/send-message-ws.service
   imports: [
     //
     SequelizeModule.forFeature([BaccaratDetailsModel]),
-    BullQueueModule,
+    forwardRef(() => BullQueueModule),
     BaccaratModule,
     HttpModule,
   ],

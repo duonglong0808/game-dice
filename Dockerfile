@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package.json ./
 
 # Install dependencies
-RUN yarn
+RUN yarn install --production && yarn cache clean
 
 # Copy the rest of the application code to the container
 COPY . .

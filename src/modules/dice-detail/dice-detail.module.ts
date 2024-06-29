@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { DiceDetailService } from './dice-detail.service';
 import { DiceDetailController } from './dice-detail.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -7,13 +7,14 @@ import { DiceDetailRepository } from './repository/dice-detail.repository';
 import { GameDiceModule } from '../dice/dice.module';
 import { DiceService } from '../dice/dice.service';
 import { RedisService } from '../cache/redis.service';
-// import { BullQueueAddQueueModule } from '../bull-queue/bull-queue.module';
 import { HttpModule } from '@nestjs/axios';
 import { SendMessageWsService } from '../send-message-ws/send-message-ws.service';
+import { BullQueueModule } from '../bull-queue/bull-queue.module';
 
 @Module({
   imports: [
     //
+    forwardRef(() => BullQueueModule),
     SequelizeModule.forFeature([DiceDetailModel]),
     GameDiceModule,
     HttpModule,
