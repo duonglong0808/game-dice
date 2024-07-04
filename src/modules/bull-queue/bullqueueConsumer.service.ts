@@ -105,10 +105,10 @@ export class BullQueueConsumerServiceCalcPointDice {
         }
       });
     }
-    // Chẵn
+    // Chẵn Xỉu
     if (totalRed == 0) {
       listUser.forEach((userAnswer) => {
-        if (userAnswer.answer == TypeAnswerDice.p4) {
+        if (userAnswer.answer == TypeAnswerDice.p4 || userAnswer.answer == TypeAnswerDice.p5) {
           const user = dataUserUpPoint.find((user) => user.userId == userAnswer.userId);
           const points = userAnswer.point + userAnswer.point * 0.96;
           if (user) user.points += points;
@@ -201,6 +201,7 @@ export class BullQueueConsumerServiceCalcPointDice {
     }
     console.log('🚀 ~ BullQueueConsumerServiceCalcPointDice ~ calcPointDice ~ dataUserUpPoint:', dataUserUpPoint);
     await this.historyPlayService.updateStatusByDiceDetailId(data.diceDetailId, 1);
+
     return this.updatePointUserAndSendWs(dataUserUpPoint);
   }
 
@@ -443,6 +444,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
     }
     console.log('🚀 ~ BullQueueConsumerServiceCalcPointBaccarat ~ calcPointDice ~ dataUserUpPoint:', dataUserUpPoint);
     await this.historyPlayService.updateStatusByBaccaratDetailId(baccaratDetailId, 1);
+
     return this.updatePointUserAndSendWs(dataUserUpPoint);
   }
 
