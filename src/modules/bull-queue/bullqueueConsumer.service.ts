@@ -279,6 +279,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
           } else
             dataUserUpPoint.push({
               pointBetMain: userAnswer.point,
+
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
@@ -447,11 +448,14 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
         // Hòa
         if (userAnswer.answer == TypeAnswerBaccarat.p3) {
           points += userAnswer.point + userAnswer.point * 8;
+        } else if (userAnswer.answer == TypeAnswerBaccarat.p4 || userAnswer.answer == TypeAnswerBaccarat.p5) {
+          points += userAnswer.point;
         }
         // Hồi tiền cược con or cái(long bảo) khi chuẩn hòa
         if ((valuePokerPlayer[0] + valuePokerPlayer[1]) % 10 >= 8 && (valuePokerBanker[0] + valuePokerBanker[1]) % 10 >= 8 && (userAnswer.answer == TypeAnswerBaccarat.p2 || userAnswer.answer == TypeAnswerBaccarat.p8)) {
           points += userAnswer.point;
         }
+
         const user = dataUserUpPoint.find((user) => user.userId == userAnswer.userId);
         if (points) {
           if (user) {
@@ -460,6 +464,7 @@ export class BullQueueConsumerServiceCalcPointBaccarat {
           } else {
             dataUserUpPoint.push({
               pointBetMain: userAnswer.point,
+
               gamePointId: userAnswer.gamePointId,
               userId: userAnswer.userId,
               points,
